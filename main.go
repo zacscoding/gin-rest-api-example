@@ -17,10 +17,77 @@ func main() {
 	}
 	defer db.Close()
 
-	db.DropTable(&models.Follow{}, &models.User{})
-	db.AutoMigrate(&models.Follow{}, &models.User{})
+	//db.DropTable(&models.Follow{}, &models.User{})
+	//db.AutoMigrate(&models.Follow{}, &models.User{})
+	//testUsers(db)
 
-	testUsers(db)
+	//db.DropTable(&models.Comment{}, &models.ArticleTag{}, &models.Tag{}, &models.ArticleFavorite{},
+	//	&models.Article{}, &models.Follow{}, &models.User{})
+	//db.AutoMigrate(&models.Follow{}, &models.User{}, &models.Article{}, &models.ArticleFavorite{}, &models.Tag{},
+	//	&models.ArticleTag{}, &models.Comment{})
+	testArticles(db)
+}
+
+func testArticles(db *gorm.DB) {
+	userRepo := repository.NewUserRepository(db)
+	articleRepo := repository.NewArticleRepository(db)
+
+	fmt.Println("Try to save user1")
+	u1 := &models.User{
+		Email:    "user1@email.com",
+		Username: "user1",
+		Password: "user1",
+		Bio:      "user1 bio",
+		Image:    "user1 image",
+	}
+	_ = userRepo.Save(u1)
+
+	fmt.Println("Try to save article1")
+	a := &models.Article{
+		Title:       "title",
+		Description: "description",
+		Body:        "body",
+		Author:      *u1,
+		AuthorID:    u1.ID,
+		Tags:        []models.Tag{
+			{
+				Name : "Tag1",
+			},
+			{
+				Name : "Tag2",
+			},
+		},
+		Comment:     nil,
+	}
+	a.UpdateSlug()
+	_ = articleRepo.SaveArticle(a)
+
+	fmt.Println("Try to save article1")
+	a2 := &models.Article{
+		Title:       "title2",
+		Description: "description2",
+		Body:        "body2",
+		AuthorID:    u1.ID,
+		Tags:        []models.Tag{
+			{
+				Name : "Tag1",
+			},
+			{
+				Name : "Tag3",
+			},
+		},
+		Comment:     nil,
+	}
+	a2.UpdateSlug()
+	_ = articleRepo.SaveArticle(a2)
+
+	fmt.Println("Try to save comment1")
+	c := &models.Comment{
+		Body:      "comment",
+		ArticleID: a.ID,
+		AuthorID:  u1.ID,
+	}
+	_ = articleRepo.SaveOne(c)
 }
 
 func testUsers(db *gorm.DB) {
@@ -78,11 +145,11 @@ func testUsers(db *gorm.DB) {
 
 	b, _ := userRepo.IsFollowing(u2, u1)
 	fmt.Println("u2 follow u1 ?", b)
-	_ = userRepo.Following(u2, u1)
+	_ = userRepo.UpdateFollow(u2, u1)
 	b, _ = userRepo.IsFollowing(u2, u1)
 	fmt.Println("u2 follow u1 (after follow)?", b)
-	_ = userRepo.Following(u3, u1)
-	_ = userRepo.Following(u1, u3)
+	_ = userRepo.UpdateFollow(u3, u1)
+	_ = userRepo.UpdateFollow(u1, u3)
 
 	followingCnt, followerCnt, err := userRepo.CountFollows(u1)
 	if err != nil {
@@ -100,7 +167,7 @@ func testUsers(db *gorm.DB) {
 		fmt.Println("> ", f)
 	}
 
-	_ = userRepo.UnFollowing(u2, u1)
+	_ = userRepo.UpdateUnFollow(u2, u1)
 	followingCnt, followerCnt, err = userRepo.CountFollows(u1)
 	if err != nil {
 		log.Fatal(err)

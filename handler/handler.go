@@ -1,5 +1,6 @@
 package handler
 
+import "gin-rest-api-example/repository"
 
 type Handler struct {
 	userRepo repository.UserRepository

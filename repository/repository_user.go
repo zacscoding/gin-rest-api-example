@@ -9,6 +9,13 @@ type userRepository struct {
 	db *gorm.DB
 }
 
+// NewUserRepository returns a new user repository
+func NewUserRepository(db *gorm.DB) *userRepository {
+	return &userRepository{
+		db: db,
+	}
+}
+
 func (u *userRepository) Save(user *models.User) error {
 	return u.db.Create(user).Error
 }
@@ -41,14 +48,14 @@ func (u *userRepository) FindByUsername(username string) (*models.User, error) {
 	return &m, nil
 }
 
-func (u *userRepository) Following(following *models.User, follower *models.User) error {
+func (u *userRepository) UpdateFollow(following *models.User, follower *models.User) error {
 	return u.db.Create(&models.Follow{
 		FollowerID:  follower.ID,
 		FollowingID: following.ID,
 	}).Error
 }
 
-func (u *userRepository) UnFollowing(following *models.User, follower *models.User) error {
+func (u *userRepository) UpdateUnFollow(following *models.User, follower *models.User) error {
 	return u.db.Where(models.Follow{
 		FollowerID:  follower.ID,
 		FollowingID: following.ID,
@@ -116,11 +123,4 @@ func (u *userRepository) FindFollowing(user *models.User) ([]*models.User, error
 		return nil, err
 	}
 	return following, nil
-}
-
-// NewUserRepository returns a new user repository
-func NewUserRepository(db *gorm.DB) *userRepository {
-	return &userRepository{
-		db: db,
-	}
 }

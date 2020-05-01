@@ -22,11 +22,11 @@ type UserRepository interface {
 	// Follows
 	// =================================
 
-	// Following given following user follow to given follower user
-	Following(following *models.User, follower *models.User) error
+	// UpdateFollow given following user follow to given follower user
+	UpdateFollow(following *models.User, follower *models.User) error
 
-	// UnFollowing given following user un follow to given follower user
-	UnFollowing(following *models.User, follower *models.User) error
+	// UpdateUnFollow given following user un follow to given follower user
+	UpdateUnFollow(following *models.User, follower *models.User) error
 
 	// CountFollows returns given user's counts of (following, followers)
 	CountFollows(user *models.User) (int, int, error)
@@ -39,4 +39,12 @@ type UserRepository interface {
 
 	// FindFollowing returns following users given user
 	FindFollowing(user *models.User) ([]*models.User, error)
+}
+
+type ArticleFilter struct {
+}
+
+type ArticleRepository interface {
+	SaveOne(data interface{}) error
+	SaveArticle(article *models.Article) error
 }
