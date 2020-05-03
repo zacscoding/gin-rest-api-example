@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"gin-rest-api-example/database/models"
 	"gin-rest-api-example/repository"
@@ -15,19 +16,25 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	db.LogMode(true)
 	defer db.Close()
 
 	//db.DropTable(&models.Follow{}, &models.User{})
 	//db.AutoMigrate(&models.Follow{}, &models.User{})
 	//testUsers(db)
 
-	//db.DropTable(&models.Comment{}, &models.ArticleTag{}, &models.Tag{}, &models.ArticleFavorite{},
-	//	&models.Article{}, &models.Follow{}, &models.User{})
-	//db.AutoMigrate(&models.Follow{}, &models.User{}, &models.Article{}, &models.ArticleFavorite{}, &models.Tag{},
-	//	&models.ArticleTag{}, &models.Comment{})
+	db.DropTable(&models.Comment{}, &models.ArticleTag{}, &models.Tag{}, &models.ArticleFavorite{},
+		&models.Article{}, &models.Follow{}, &models.User{})
+	db.AutoMigrate(&models.Follow{}, &models.User{}, &models.Article{}, &models.ArticleFavorite{}, &models.Tag{},
+		&models.ArticleTag{}, &models.Comment{})
 	testArticles(db)
 }
 
+// user : u1, u2
+// articles (title, tags, author, liked user)
+//  - "title" / ["Tag1", "Tag2"] / u1 / u2
+//  - "title2" / ["Tag1", "Tag3"] / u1 / u2
+//  - "title3" / ["Tag3", "Tag4"] / u2 / u1
 func testArticles(db *gorm.DB) {
 	userRepo := repository.NewUserRepository(db)
 	articleRepo := repository.NewArticleRepository(db)
@@ -42,6 +49,16 @@ func testArticles(db *gorm.DB) {
 	}
 	_ = userRepo.Save(u1)
 
+	fmt.Println("Try to save user2")
+	u2 := &models.User{
+		Email:    "user2@email.com",
+		Username: "user2",
+		Password: "user2",
+		Bio:      "user2 bio",
+		Image:    "user2 image",
+	}
+	_ = userRepo.Save(u2)
+
 	fmt.Println("Try to save article1")
 	a := &models.Article{
 		Title:       "title",
@@ -49,37 +66,68 @@ func testArticles(db *gorm.DB) {
 		Body:        "body",
 		Author:      *u1,
 		AuthorID:    u1.ID,
-		Tags:        []models.Tag{
+		Tags: []models.Tag{
 			{
-				Name : "Tag1",
+				Name: "Tag1",
 			},
 			{
-				Name : "Tag2",
+				Name: "Tag2",
 			},
 		},
-		Comment:     nil,
+		Comment: nil,
 	}
 	a.UpdateSlug()
 	_ = articleRepo.SaveArticle(a)
+	articleRepo.UpdateFavorite(&models.ArticleFavorite{
+		UserID:    u2.ID,
+		ArticleID: a.ID,
+	})
 
-	fmt.Println("Try to save article1")
+	fmt.Println("Try to save article2")
 	a2 := &models.Article{
 		Title:       "title2",
 		Description: "description2",
 		Body:        "body2",
 		AuthorID:    u1.ID,
-		Tags:        []models.Tag{
+		Tags: []models.Tag{
 			{
-				Name : "Tag1",
+				Name: "Tag1",
 			},
 			{
-				Name : "Tag3",
+				Name: "Tag3",
 			},
 		},
-		Comment:     nil,
+		Comment: nil,
 	}
 	a2.UpdateSlug()
 	_ = articleRepo.SaveArticle(a2)
+	articleRepo.UpdateFavorite(&models.ArticleFavorite{
+		UserID:    u2.ID,
+		ArticleID: a2.ID,
+	})
+
+	fmt.Println("Try to save article3")
+	a3 := &models.Article{
+		Title:       "title3",
+		Description: "description3",
+		Body:        "body3",
+		AuthorID:    u2.ID,
+		Tags: []models.Tag{
+			{
+				Name: "Tag3",
+			},
+			{
+				Name: "Tag4",
+			},
+		},
+		Comment: nil,
+	}
+	a3.UpdateSlug()
+	_ = articleRepo.SaveArticle(a3)
+	_ = articleRepo.UpdateFavorite(&models.ArticleFavorite{
+		UserID:    u1.ID,
+		ArticleID: a3.ID,
+	})
 
 	fmt.Println("Try to save comment1")
 	c := &models.Comment{
@@ -88,6 +136,55 @@ func testArticles(db *gorm.DB) {
 		AuthorID:  u1.ID,
 	}
 	_ = articleRepo.SaveOne(c)
+
+	fmt.Println(">>>> FindArticleBySlug")
+	find, _ := articleRepo.FindArticleBySlug(a.Slug)
+	b, _ := json.Marshal(find)
+	fmt.Println(string(b))
+
+	fmt.Println(">>>> FindArticles")
+	articles, count, _ := articleRepo.FindArticles(repository.Pageable{
+		Offset: 0,
+		Limit:  1,
+	})
+	fmt.Println("total count :", count)
+	for _, a := range articles {
+		b, _ := json.Marshal(a)
+		fmt.Println(string(b))
+	}
+
+	fmt.Println(">>>> FindArticles by tag : Tag1")
+	articles, count, _ = articleRepo.FindArticlesByTag("Tag1", repository.Pageable{
+		Offset: 0,
+		Limit:  1,
+	})
+	fmt.Println("total count :", count)
+	for _, a := range articles {
+		b, _ := json.Marshal(a)
+		fmt.Println(string(b))
+	}
+
+	fmt.Println(">>>> FindArticles by author : user1")
+	articles, count, _ = articleRepo.FindArticlesByAuthor("user1", repository.Pageable{
+		Offset: 0,
+		Limit:  1,
+	})
+	fmt.Println("total count :", count)
+	for _, a := range articles {
+		b, _ := json.Marshal(a)
+		fmt.Println(string(b))
+	}
+
+	fmt.Println(">>>> FindArticles by favorited by", u2.Username)
+	articles, count, _ = articleRepo.FindArticlesByFavoritedUsername(u2.Username, repository.Pageable{
+		Offset: 0,
+		Limit:  1,
+	})
+	fmt.Println("total count :", count)
+	for _, a := range articles {
+		b, _ := json.Marshal(a)
+		fmt.Println(string(b))
+	}
 }
 
 func testUsers(db *gorm.DB) {

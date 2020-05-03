@@ -7,11 +7,12 @@ import (
 
 type User struct {
 	gorm.Model
-	Email    string `gorm:"column:email;unique_index"`
-	Username string `gorm:"column:username;unique_index"`
-	Password string `gorm:"column:password; not null"`
-	Bio      string `gorm:"column:bio;size:1024"`
-	Image    string
+	Email     string `gorm:"column:email;unique_index"`
+	Username  string `gorm:"column:username;unique_index"`
+	Password  string `gorm:"column:password; not null"`
+	Bio       string `gorm:"column:bio;size:1024"`
+	Image     string
+	Favorites []Article `gorm:"many2many:article_favorites;"`
 }
 
 type Follow struct {

@@ -41,10 +41,41 @@ type UserRepository interface {
 	FindFollowing(user *models.User) ([]*models.User, error)
 }
 
-type ArticleFilter struct {
-}
-
 type ArticleRepository interface {
+	// SaveOne save given interface
 	SaveOne(data interface{}) error
+
+	// =================================
+	// Articles
+	// =================================
+
+	// SaveArticle save given article with tags
 	SaveArticle(article *models.Article) error
+
+	// FindArticleBySlug returns a article with given slug or nil if empty
+	FindArticleBySlug(slug string) (*models.Article, error)
+
+	// FindArticles return articles,count given pageable
+	FindArticles(p Pageable) ([]models.Article, int, error)
+
+	// FindArticlesByTag returns articles, count given pageable and tag name
+	FindArticlesByTag(tag string, p Pageable) ([]models.Article, int, error)
+
+	// FindArticlesByAuthor returns articles, count given pageable and author name
+	FindArticlesByAuthor(username string, p Pageable) ([]models.Article, int, error)
+
+	// FindArticlesByFavoritedUsername returns articles, count given pageable and who favorited by username
+	FindArticlesByFavoritedUsername(username string, p Pageable) ([]models.Article, int, error)
+
+	// =================================
+	// Article favorites
+	// =================================
+
+	// UpdateFavorite update favorite by given user and article
+	UpdateFavorite(articleFavorite *models.ArticleFavorite) error
+
+	// =================================
+	// Article comments
+	// =================================
+
 }

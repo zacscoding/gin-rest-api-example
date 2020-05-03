@@ -13,8 +13,9 @@ type Article struct {
 	Body        string `gorm:"size:2048"`
 	Author      User
 	AuthorID    uint
-	Tags        []Tag     `gorm:"many2many:article_tags;"`
+	Tags        []Tag     `gorm:"many2many:article_tags;association_autocreate:false"`
 	Comment     []Comment `gorm:"ForeignKey:ArticleID"`
+	Favorites   []User    `gorm:"many2many:article_favorites;"`
 }
 
 func (a *Article) UpdateSlug() {

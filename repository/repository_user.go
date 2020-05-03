@@ -97,6 +97,7 @@ func (u *userRepository) IsFollowing(user *models.User, follower *models.User) (
 	return true, nil
 }
 
+// TODO : refactor to use models
 func (u *userRepository) FindFollowers(user *models.User) ([]*models.User, error) {
 	var followers []*models.User
 	err := u.db.Table("users").
@@ -111,6 +112,7 @@ func (u *userRepository) FindFollowers(user *models.User) ([]*models.User, error
 	return followers, nil
 }
 
+// TODO : refactor to use models
 func (u *userRepository) FindFollowing(user *models.User) ([]*models.User, error) {
 	var following []*models.User
 	err := u.db.Table("users").
