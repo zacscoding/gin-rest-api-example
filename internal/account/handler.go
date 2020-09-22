@@ -15,6 +15,16 @@ func (h *Handler) handleMe(ctx *gin.Context) {
 	logger := logging.FromContext(ctx)
 	logger.Info("handle me..")
 
+	acc, _ := CurrentUser(ctx)
+	ctx.JSON(http.StatusOK, gin.H{
+		"acc": acc,
+	})
+}
+
+func (h *Handler) handleYou(ctx *gin.Context) {
+	logger := logging.FromContext(ctx)
+	logger.Info("handle you..")
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "hello",
 	})

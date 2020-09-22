@@ -17,13 +17,15 @@ func TestLoad(t *testing.T) {
 	assert.Equal(t, defaultConfig["server.timeoutSecs"].(int), cfg.ServerConfig.TimeoutSecs)
 	assert.Equal(t, defaultConfig["server.readTimeoutSecs"].(int), cfg.ServerConfig.ReadTimeoutSecs)
 	assert.Equal(t, defaultConfig["server.writeTimeoutSecs"].(int), cfg.ServerConfig.WriteTimeoutSecs)
+	// jwt configs
+	assert.Equal(t, defaultConfig["jwt.secret"].(string), cfg.JwtConfig.Secret)
+	assert.Equal(t, defaultConfig["jwt.sessionTime"].(int), cfg.JwtConfig.SessionTime)
 	// db configs
-	assert.Equal(t, defaultConfig["db.driverName"].(string), cfg.DBConfig.DriverName)
 	assert.Equal(t, defaultConfig["db.dataSourceName"].(string), cfg.DBConfig.DataSourceName)
+	assert.Equal(t, defaultConfig["db.createTable"].(bool), cfg.DBConfig.Migrate)
 	assert.Equal(t, defaultConfig["db.pool.maxOpen"].(int), cfg.DBConfig.Pool.MaxOpen)
 	assert.Equal(t, defaultConfig["db.pool.maxIdle"].(int), cfg.DBConfig.Pool.MaxIdle)
 	assert.Equal(t, defaultConfig["db.pool.maxLifetime"].(int), cfg.DBConfig.Pool.MaxLifetime)
-	assert.Equal(t, defaultConfig["db.createTable"].(bool), cfg.DBConfig.CreateTable)
 }
 
 func TestLoadWithEnv(t *testing.T) {

@@ -2,6 +2,7 @@
 
 - [API Overview](#API-Overview)
 - [User API](#User-API)  
+    - [Authentication](#Authentication)
     - [User registration](#User-Registration)  
     - [Get current user](#Get-current-user)  
     - [Update user](#Update-user)
@@ -15,15 +16,49 @@
     - [List Comments from an Article](#List-Comments-from-an-Article)
 - [TODO](#TODO)
 
-    
-
 ## API Overview
 
 ---  
     
 ## User API  
 
-### User registration  
+### Authentication  
+
+`POST /v1/api/users/login`  
+
+#### Request body  
+
+| **Parameter** | **Type** | **Description** | **Required** |
+|---------------|----------|-----------------|--------------|
+| user          | Object   | a user          | yes          |
+| user.email    | String   | email address   | yes          |
+| user.password | String   | password        | yes          |
+
+```json
+{
+  "user":{
+    "email": "zaccoding@github.com",
+    "password": "zaccoding"
+  }
+}
+```  
+
+#### Response  
+
+`Status: 200 OK`  
+
+```json
+{
+    "code": 200,
+    "expire": "2020-09-23T00:09:36.1524+09:00",
+    "meta": "meta",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDA3ODczNzYsImlkIjoiYWRtaW5AZW1haWwuY29tIiwib3JpZ19pYXQiOjE2MDA3ODcyODl9.AIoE8jlM68l05l4be0irTo6-0fw1nbBIINDJhLDJ0IY"
+}
+```  
+
+<br />
+
+### User Registration  
   
 `POST /v1/api/users`  
 
@@ -32,6 +67,7 @@
 | **Parameter** | **Type** | **Description** | **Required** |
 |---------------|----------|-----------------|--------------|
 | user          | Object   | a user          | yes          |
+| user.username | String   | name            | yes          |
 | user.email    | String   | email address   | yes          |
 | user.password | String   | password        | yes          |
 
@@ -60,9 +96,11 @@
 }
 ```  
 
+<br />
+
 ### Get current user  
 
-`GET /v1/api/user`  
+`GET /v1/api/user/me`  
 
 Authentication required.  
 
@@ -172,7 +210,7 @@ Authentication required.
 }
 ```  
 
-
+<br />
 
 ## Get a article  
 
@@ -208,9 +246,9 @@ Authentication required.
 }
 ``` 
 
+<br />
 
-
-## List articles  
+## List Articles  
 
 `GET /v1/api/articles?tag=AngularJS&author=zaccoding&limit=20&offset=0`  
 
@@ -258,7 +296,7 @@ Authentication required.
 }
 ```  
 
-
+<br />
 
 ## Delete a article  
 
@@ -327,7 +365,7 @@ Authentication required.
 }
 ```  
 
-
+<br />
 
 ### List Comments from an Article
 
@@ -359,7 +397,7 @@ Authentication required.
 }
 ```  
 
-
+<br />
 
 ### Delete a comment  
 

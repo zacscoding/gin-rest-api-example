@@ -14,6 +14,7 @@ import (
 
 type Config struct {
 	ServerConfig ServerConfig `json:"server"`
+	JwtConfig    JWTConfig    `json:"jwt"`
 	DBConfig     DBConfig     `json:"db"`
 }
 
@@ -24,27 +25,30 @@ type ServerConfig struct {
 	WriteTimeoutSecs int `json:"writeTimeoutSecs"`
 }
 
+type JWTConfig struct {
+	Secret      string `json:"secret"`
+	SessionTime int    `json:"sessionTime"`
+}
+
 type DBConfig struct {
-	DriverName     string `json:"driverName"`
 	DataSourceName string `json:"dataSourceName"`
+	Migrate        bool   `json:"migrate"`
 	Pool           struct {
 		MaxOpen     int `json:"maxOpen"`
 		MaxIdle     int `json:"maxIdle"`
 		MaxLifetime int `json:"maxLifetime"`
 	} `json:"pool"`
-	CreateTable bool
 }
 
 func (c *DBConfig) MarshalJSON() ([]byte, error) {
 	m := map[string]interface{}{
-		"driverName":     c.DriverName,
 		"dataSourceName": "[PROTECTED]", // TODO : masking
 		"pool": map[string]interface{}{
 			"maxOpen":     c.Pool.MaxOpen,
 			"maxIdle":     c.Pool.MaxIdle,
 			"maxLifetime": c.Pool.MaxLifetime,
 		},
-		"createTable": c.CreateTable,
+		"migrate": c.Migrate,
 	}
 	return json.Marshal(m)
 }

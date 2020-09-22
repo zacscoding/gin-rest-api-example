@@ -61,6 +61,7 @@ func runApplication() {
 			database.NewDatabase,
 			// setup account packages
 			accountDB.NewAccountDB,
+			account.NewAuthMiddleware,
 			account.NewHandler,
 			// server
 			newServer,

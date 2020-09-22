@@ -6,7 +6,11 @@ var defaultConfig = map[string]interface{}{
 	"server.readTimeoutSecs":  5,
 	"server.writeTimeoutSecs": 5,
 
+	"jwt.secret":         "secret-key",
+	"jwt.sessionTime": 86400,
+
 	"db.dataSourceName":   "root:password@tcp(127.0.0.1:3306)/local_db?charset=utf8&parseTime=True",
+	"db.migrate":          true,
 	"db.pool.maxOpen":     50,
 	"db.pool.maxIdle":     5,
 	"db.pool.maxLifetime": 5,

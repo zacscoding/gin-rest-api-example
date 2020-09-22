@@ -37,7 +37,7 @@ func NewTestDatabase(tb testing.TB, migration bool) *gorm.DB {
 	err = resource.Expire(60 * 5)
 
 	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
-	dcn := fmt.Sprintf("root:secret@(localhost:%s)/mysql", resource.GetPort("3306/tcp"))
+	dcn := fmt.Sprintf("root:secret@(localhost:%s)/mysql?charset=utf8&parseTime=True", resource.GetPort("3306/tcp"))
 	if err := pool.Retry(func() error {
 		var err error
 		db, err = sql.Open("mysql", dcn)
@@ -51,12 +51,9 @@ func NewTestDatabase(tb testing.TB, migration bool) *gorm.DB {
 
 	tb.Cleanup(func() {
 		db.Close()
-		fmt.Println("## TB.Cleanup")
 		if err := pool.Purge(resource); err != nil {
-			fmt.Println("fail cleanup!!")
 			log.Fatalf("Failed to purge resource: %s", err)
 		}
-		fmt.Println("Success to clean up")
 	})
 
 	gdb, err := gorm.Open(gMysql.New(gMysql.Config{

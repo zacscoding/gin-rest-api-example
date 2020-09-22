@@ -1,6 +1,9 @@
 MODULE = $(shell go list -m)
 
-.PHONY: build build-docker compose compose-down test
+.PHONY: generate build build-docker compose compose-down test
+generate:
+	go generate ./...
+
 build: # build a server
 	go build -a -o article-server $(MODULE)/cmd/server
 

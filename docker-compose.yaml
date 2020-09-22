@@ -10,19 +10,17 @@ services:
       - MYSQL_DATABASE=local_db
     ports:
       - 3306:3306
-    volumes:
-      - ./migrations:/docker-entrypoint-initdb.d/:ro
-  article-server:
-    image: gin-example/article-server
-    build:
-      context: .
-      dockerfile: cmd/server/Dockerfile
-    container_name: article-server
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./config/local.yaml:/bin/config.yaml
-    command: article-server --conf /bin/config.yaml
-    restart: always
-    depends_on:
-      - "db"
+#  article-server:
+#    image: gin-example/article-server
+#    build:
+#      context: .
+#      dockerfile: cmd/server/Dockerfile
+#    container_name: article-server
+#    ports:
+#      - "3000:3000"
+#    volumes:
+#      - ./config/local.yaml:/bin/config.yaml
+#    command: article-server --conf /bin/config.yaml
+#    restart: always
+#    depends_on:
+#      - "db"
