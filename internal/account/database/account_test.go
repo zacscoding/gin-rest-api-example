@@ -76,6 +76,7 @@ func (s *DBSuite) TestSave_ErrorIfExistEmail() {
 
 	// then
 	s.Error(err)
+	s.Equal(database.ErrKeyConflict, err)
 }
 
 func (s *DBSuite) TestUpdate() {
@@ -95,11 +96,11 @@ func (s *DBSuite) TestUpdate() {
 	}
 
 	// when
-	ok, err := s.db.Update(nil, acc.Email, updated)
+	err := s.db.Update(nil, acc.Email, updated)
 
 	// then
 	s.NoError(err)
-	s.True(ok)
+
 	find, err := s.db.FindByEmail(nil, acc.Email)
 	s.NoError(err)
 	// unchanged fields
@@ -112,15 +113,15 @@ func (s *DBSuite) TestUpdate() {
 	s.Equal(updated.Image, find.Image)
 }
 
-func (s *DBSuite) TestUpdate_FalseIfNotExist() {
+func (s *DBSuite) TestUpdate_FailIfNotExist() {
 	// when
-	ok, err := s.db.Update(nil, "unknown@emai.com", &model.Account{
+	err := s.db.Update(nil, "unknown@emai.com", &model.Account{
 		Username: "updated",
 	})
 
 	// then
-	s.False(ok)
-	s.NoError(err)
+	s.Error(err)
+	s.Equal(database.ErrNotFound, err)
 }
 
 func (s *DBSuite) TestFindByEmail() {
@@ -155,4 +156,5 @@ func (s *DBSuite) TestFindByEmail_ErrorIfNotExist() {
 	// then
 	s.Nil(find)
 	s.Error(err)
+	s.Equal(database.ErrNotFound, err)
 }

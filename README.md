@@ -17,4 +17,18 @@ API Server technology stack is
 
 > ## Getting started  
 
-; TBD
+; TBD  
+
+---  
+
+## TODO  
+
+- [x] add user, article with comment api spec
+- [x] add common error response
+- [x] configure project layer
+- [x] impl account db
+- [x] impl account handler (binding, serialize, common error middleware, etc...)
+- [ ] impl article db
+- [ ] impl article handler
+- [ ] configure docker compose
+- [ ] configure tests (newman or http)

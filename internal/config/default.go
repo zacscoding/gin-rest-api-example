@@ -4,9 +4,9 @@ var defaultConfig = map[string]interface{}{
 	"server.port":             3000,
 	"server.timeoutSecs":      5,
 	"server.readTimeoutSecs":  5,
-	"server.writeTimeoutSecs": 5,
+	"server.writeTimeoutSecs": 30,
 
-	"jwt.secret":         "secret-key",
+	"jwt.secret":      "secret-key",
 	"jwt.sessionTime": 86400,
 
 	"db.dataSourceName":   "root:password@tcp(127.0.0.1:3306)/local_db?charset=utf8&parseTime=True",

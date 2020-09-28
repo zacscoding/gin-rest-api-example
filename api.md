@@ -14,7 +14,6 @@
 - [Comment API](#Comment-API)  
     - [Create a comment](#Create-a-comment)  
     - [List Comments from an Article](#List-Comments-from-an-Article)
-- [TODO](#TODO)
 
 ## API Overview
 
@@ -130,7 +129,7 @@ Authentication required.
 | **Parameter** | **Type** | **Description** | **Required** |
 |---------------|----------|-----------------|--------------|
 | user          | Object   | User's object   | no           |
-| user.email    | String   | email address   | no           |
+| user.username | String   | user name       | no           |
 | user.password | String   | password        | no           |
 | user.bio      | String   | biography       | no           |
 | user.image    | String   | image url       | no           |  
@@ -418,7 +417,3 @@ Authentication required.
 
 ---  
 
-## TODO
-
-- [x] add user, article with comment api spec
-- [ ] add common error response

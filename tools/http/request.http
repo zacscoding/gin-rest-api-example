@@ -1,0 +1,78 @@
+### Invalid user registration - 1
+POST http://localhost:3000/v1/api/users
+Content-Type: application/json
+
+{
+}
+
+### Invalid user registration - 2
+POST http://localhost:3000/v1/api/users
+Content-Type: application/json
+
+{
+  "user": {
+    "username": "zacscoding"
+  }
+}
+
+### Invalid user registration - 3
+POST http://localhost:3000/v1/api/users
+Content-Type: application/json
+
+{
+  "user": {
+    "username": "zacscoding",
+    "email": "non-email-format"
+  }
+}
+
+### Invalid user registration - 4
+POST http://localhost:3000/v1/api/users
+Content-Type: application/json
+
+{
+  "user": {
+    "username": "zacscoding",
+    "email": "zacscoding@gmail.com"
+  }
+}
+
+### Invalid user registration - 5
+POST http://localhost:3000/v1/api/users
+Content-Type: application/json
+
+{
+  "user": {
+    "username": "zacscoding",
+    "email": "zacscoding@gmail.com",
+    "password": "1"
+  }
+}
+
+### Valid user registration
+POST http://localhost:3000/v1/api/users
+Content-Type: application/json
+
+{
+  "user": {
+    "username": "zacscoding",
+    "email": "zacscoding@gmail.com",
+    "password": "12345"
+  }
+}
+
+### Sign in
+POST http://localhost:3000/v1/api/users/login
+Content-Type: application/json
+
+{
+  "user": {
+    "email": "zacscoding@gmail.com",
+    "password": "12345"
+  }
+}
+
+### Current user
+GET http://localhost:3000/v1/api/user/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDEzMDYzNjksImlkIjoiemFjc2NvZGluZ0BnbWFpbC5jb20iLCJvcmlnX2lhdCI6MTYwMTMwNjI4M30.4bkZ49TGJYNofBe3of7RrIUbCYbOLYwKcHIlYrk-fJU
+Content-Type: application/json

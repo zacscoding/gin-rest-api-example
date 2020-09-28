@@ -53,22 +53,15 @@ func (_m *AccountDB) Save(ctx context.Context, account *model.Account) error {
 }
 
 // Update provides a mock function with given fields: ctx, email, account
-func (_m *AccountDB) Update(ctx context.Context, email string, account *model.Account) (bool, error) {
+func (_m *AccountDB) Update(ctx context.Context, email string, account *model.Account) error {
 	ret := _m.Called(ctx, email, account)
 
-	var r0 bool
-	if rf, ok := ret.Get(0).(func(context.Context, string, *model.Account) bool); ok {
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, *model.Account) error); ok {
 		r0 = rf(ctx, email, account)
 	} else {
-		r0 = ret.Get(0).(bool)
+		r0 = ret.Error(0)
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, *model.Account) error); ok {
-		r1 = rf(ctx, email, account)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }

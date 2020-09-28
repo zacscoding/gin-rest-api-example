@@ -15,7 +15,7 @@ type AccountDB interface {
 	Save(ctx context.Context, account *model.Account) error
 
 	// Update updates a given account
-	Update(ctx context.Context, email string, account *model.Account) (bool, error)
+	Update(ctx context.Context, email string, account *model.Account) error
 
 	// FindByEmail returns an account with given email if exist
 	FindByEmail(ctx context.Context, email string) (*model.Account, error)
@@ -32,12 +32,15 @@ func (a *accountDB) Save(ctx context.Context, account *model.Account) error {
 
 	if err := db.WithContext(ctx).Create(account).Error; err != nil {
 		logger.Error("account.db.Save failed to save", "err", err)
+		if database.IsKeyConflictErr(err) {
+			return database.ErrKeyConflict
+		}
 		return err
 	}
 	return nil
 }
 
-func (a *accountDB) Update(ctx context.Context, email string, account *model.Account) (bool, error) {
+func (a *accountDB) Update(ctx context.Context, email string, account *model.Account) error {
 	logger := logging.FromContext(ctx)
 	db := database.FromContext(ctx, a.db)
 	logger.Debugw("account.db.Update", "account", account)
@@ -62,9 +65,12 @@ func (a *accountDB) Update(ctx context.Context, email string, account *model.Acc
 		UpdateColumns(fields)
 	if chain.Error != nil {
 		logger.Error("account.db.Update failed to update", "err", chain.Error)
-		return false, chain.Error
+		return chain.Error
 	}
-	return chain.RowsAffected > 0, nil
+	if chain.RowsAffected == 0 {
+		return database.ErrNotFound
+	}
+	return nil
 }
 
 func (a *accountDB) FindByEmail(ctx context.Context, email string) (*model.Account, error) {
@@ -75,6 +81,9 @@ func (a *accountDB) FindByEmail(ctx context.Context, email string) (*model.Accou
 	var acc model.Account
 	if err := db.WithContext(ctx).Where("email = ?", email).First(&acc).Error; err != nil {
 		logger.Error("account.db.FindByEmail failed to find", "err", err)
+		if database.IsRecordNotFoundErr(err) {
+			return nil, database.ErrNotFound
+		}
 		return nil, err
 	}
 	return &acc, nil

@@ -7,6 +7,7 @@ import (
 	"gin-rest-api-example/pkg/logging"
 	"github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
@@ -14,8 +15,10 @@ import (
 var identityKey = "id"
 
 type signIn struct {
-	Username string `form:"username" json:"username" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
+	User struct {
+		Email    string `form:"email" json:"email" binding:"email"`
+		Password string `form:"password" json:"password" binding:"required"`
+	} `json:"user"`
 }
 
 func CurrentUser(c *gin.Context) (*model.Account, bool) {
@@ -25,6 +28,14 @@ func CurrentUser(c *gin.Context) (*model.Account, bool) {
 	}
 	acc, ok := data.(*model.Account)
 	return acc, ok
+}
+
+func MustCurrentUser(c *gin.Context) *model.Account {
+	acc, ok := CurrentUser(c)
+	if ok {
+		return acc
+	}
+	panic("no account in gin.Context")
 }
 
 func NewAuthMiddleware(cfg *config.Config, accountDB accountDB.AccountDB) (*jwt.GinJWTMiddleware, error) {
@@ -51,14 +62,20 @@ func NewAuthMiddleware(cfg *config.Config, accountDB accountDB.AccountDB) (*jwt.
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
 			var req signIn
-			if err := c.ShouldBind(&req); err != nil {
+			if err := c.ShouldBindJSON(&req); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
-			logging.FromContext(c).Info("middleware.jwt.Authenticator", "email", req.Username)
+			logging.FromContext(c).Info("middleware.jwt.Authenticator", "email", req.User.Email)
 
-			acc, err := accountDB.FindByEmail(c.Request.Context(), req.Username)
-			// TODO : password hash matches
-			if err != nil || acc.Password != req.Password || acc.Disabled {
+			acc, err := accountDB.FindByEmail(c.Request.Context(), req.User.Email)
+			if err != nil || acc.Disabled {
+				return nil, jwt.ErrFailedAuthentication
+			}
+			err = MatchesPassword(acc.Password, req.User.Password)
+			if err != nil {
+				if err != bcrypt.ErrMismatchedHashAndPassword {
+					logging.FromContext(c).Warnw("middleware.jwt.Authenticator found unknown error when matches password", "err", err)
+				}
 				return nil, jwt.ErrFailedAuthentication
 			}
 			return &model.Account{
@@ -88,7 +105,6 @@ func NewAuthMiddleware(cfg *config.Config, accountDB accountDB.AccountDB) (*jwt.
 				"code":   code,
 				"token":  token,
 				"expire": expire,
-				"meta":   "meta",
 			})
 		},
 		TokenLookup:   "header: Authorization",
