@@ -13,11 +13,16 @@ type contextKey = string
 const loggerKey = contextKey("logger")
 
 var (
+	level = zapcore.Level(-1)
 	// defaultLogger is the default logger. It is initialized once per package
 	// include upon calling DefaultLogger.
 	defaultLogger     *zap.SugaredLogger
 	defaultLoggerOnce sync.Once
 )
+
+func SetLevel(l zapcore.Level) {
+	level = l
+}
 
 // NewLogger creates a new logger with the given log level
 func NewLogger(level zapcore.Level) *zap.SugaredLogger {
@@ -41,7 +46,7 @@ func NewLogger(level zapcore.Level) *zap.SugaredLogger {
 // DefaultLogger returns the default logger for the package.
 func DefaultLogger() *zap.SugaredLogger {
 	defaultLoggerOnce.Do(func() {
-		defaultLogger = NewLogger(zapcore.Level(-1))
+		defaultLogger = NewLogger(level)
 	})
 	return defaultLogger
 }

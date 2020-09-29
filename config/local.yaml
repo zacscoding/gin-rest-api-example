@@ -7,7 +7,7 @@ jwt:
   secret: secret-key
   sessionTime: 86400
 db:
-  dataSourceName: root:password@tcp(127.0.0.1:3306)/local_db?charset=utf8&parseTime=True
+  dataSourceName: root:password@tcp(127.0.0.1:3306)/local_db?charset=utf8&parseTime=True&multiStatements=true
   migrate: true
   pool:
     maxOpen: 50

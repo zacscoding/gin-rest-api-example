@@ -7,10 +7,12 @@ import (
 	"gin-rest-api-example/internal/account/model"
 	"gin-rest-api-example/internal/config"
 	"gin-rest-api-example/internal/database"
+	"gin-rest-api-example/pkg/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"github.com/tidwall/gjson"
+	"go.uber.org/zap/zapcore"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,6 +24,10 @@ type HandlerSuite struct {
 	r       *gin.Engine
 	handler *Handler
 	db      *mocks.AccountDB
+}
+
+func (s *HandlerSuite) SetupSuite() {
+	logging.SetLevel(zapcore.FatalLevel)
 }
 
 func (s *HandlerSuite) SetupTest() {

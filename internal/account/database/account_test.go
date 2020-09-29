@@ -3,7 +3,9 @@ package database
 import (
 	"gin-rest-api-example/internal/account/model"
 	"gin-rest-api-example/internal/database"
+	"gin-rest-api-example/pkg/logging"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/zap/zapcore"
 	"gorm.io/gorm"
 	"testing"
 	"time"
@@ -16,6 +18,7 @@ type DBSuite struct {
 }
 
 func (s *DBSuite) SetupSuite() {
+	logging.SetLevel(zapcore.FatalLevel)
 	s.originDB = database.NewTestDatabase(s.T(), true)
 	s.db = &accountDB{
 		db: s.originDB,

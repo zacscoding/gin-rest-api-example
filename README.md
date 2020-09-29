@@ -28,7 +28,7 @@ API Server technology stack is
 - [x] configure project layer
 - [x] impl account db
 - [x] impl account handler (binding, serialize, common error middleware, etc...)
-- [ ] impl article db
+- [x] impl article db
 - [ ] impl article handler
 - [ ] configure docker compose
 - [ ] configure tests (newman or http)

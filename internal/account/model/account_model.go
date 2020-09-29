@@ -7,13 +7,12 @@ import (
 )
 
 type Account struct {
-	ID       uint   `gorm:"column:id"`
-	Username string `gorm:"column:username"`
-	Email    string `gorm:"column:email"`
-	Password string `gorm:"column:password"`
-	Bio      string `gorm:"column:bio"`
-	Image    string `gorm:"column:image"`
-
+	ID        uint      `gorm:"column:id"`
+	Username  string    `gorm:"column:username"`
+	Email     string    `gorm:"column:email"`
+	Password  string    `gorm:"column:password"`
+	Bio       string    `gorm:"column:bio"`
+	Image     string    `gorm:"column:image"`
 	CreatedAt time.Time `gorm:"column:created_at"`
 	UpdatedAt time.Time `gorm:"column:updated_at"`
 	Disabled  bool      `gorm:"column:disabled"`

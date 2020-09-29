@@ -10,13 +10,18 @@ import (
 	_ "github.com/golang-migrate/migrate/source/file"
 	gMysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/ory/dockertest/v3"
 )
+
+type CloseFunc func() error
 
 // NewTestDatabase start a mysql docker container and returns gorm.DB
 func NewTestDatabase(tb testing.TB, migration bool) *gorm.DB {
@@ -30,14 +35,14 @@ func NewTestDatabase(tb testing.TB, migration bool) *gorm.DB {
 	}
 
 	// pulls an image, creates a container based on it and runs it
-	resource, err := pool.Run("mysql", "5.7", []string{"MYSQL_ROOT_PASSWORD=secret"})
+	resource, err := pool.Run("mysql", "8.0.17", []string{"MYSQL_ROOT_PASSWORD=secret"})
 	if err != nil {
 		tb.Fatalf("Failed to not start resource: %v", err)
 	}
 	err = resource.Expire(60 * 5)
 
 	// exponential backoff-retry, because the application in the container might not be ready to accept connections yet
-	dcn := fmt.Sprintf("root:secret@(localhost:%s)/mysql?charset=utf8&parseTime=True", resource.GetPort("3306/tcp"))
+	dcn := fmt.Sprintf("root:secret@(localhost:%s)/mysql?charset=utf8&parseTime=True&multiStatements=true", resource.GetPort("3306/tcp"))
 	if err := pool.Retry(func() error {
 		var err error
 		db, err = sql.Open("mysql", dcn)
@@ -50,7 +55,7 @@ func NewTestDatabase(tb testing.TB, migration bool) *gorm.DB {
 	}
 
 	tb.Cleanup(func() {
-		db.Close()
+		_ = db.Close()
 		if err := pool.Purge(resource); err != nil {
 			log.Fatalf("Failed to purge resource: %s", err)
 		}
@@ -58,7 +63,16 @@ func NewTestDatabase(tb testing.TB, migration bool) *gorm.DB {
 
 	gdb, err := gorm.Open(gMysql.New(gMysql.Config{
 		Conn: db,
-	}), &gorm.Config{})
+	}), &gorm.Config{
+		Logger: logger.New(
+			log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+			logger.Config{
+				SlowThreshold: time.Second,   // Slow SQL threshold
+				LogLevel:      logger.Silent, // Log level
+				Colorful:      true,          // Disable color
+			},
+		),
+	})
 
 	if err != nil {
 		log.Fatalf("Failed to create a new gorm.DB: %s", err)
@@ -71,6 +85,25 @@ func NewTestDatabase(tb testing.TB, migration bool) *gorm.DB {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
 	return gdb
+}
+
+func DeleteRecordAll(_ testing.TB, db *gorm.DB, tableWhereClauses []string) error {
+	if len(tableWhereClauses)%2 != 0 {
+		return errors.New("must exist table and where clause")
+	}
+
+	for i := 0; i < len(tableWhereClauses)-1; i += 2 {
+		rowDB, err := db.DB()
+		if err != nil {
+			return err
+		}
+		query := fmt.Sprintf("DELETE FROM %s WHERE %s", tableWhereClauses[i], tableWhereClauses[i+1])
+		_, err = rowDB.Exec(query)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func migrateDB(dcn string) error {
