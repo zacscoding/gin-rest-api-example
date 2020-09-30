@@ -221,6 +221,9 @@ func (s *DBSuite) TestDeleteArticleBySlug_FailIfNotExist() {
 	// given
 	article := newArticle("title1", "title1", "body", dUser, []string{"tag1"})
 	s.NoError(s.db.SaveArticle(nil, article))
+	article2 := newArticle("title2", "title2", "body", dUser, []string{"tag1"})
+	s.NoError(s.db.SaveArticle(nil, article2))
+	s.NoError(s.db.DeleteArticleBySlug(nil, article2.Author.ID, article2.Slug))
 
 	cases := []struct {
 		AuthorID uint
@@ -230,8 +233,11 @@ func (s *DBSuite) TestDeleteArticleBySlug_FailIfNotExist() {
 			AuthorID: dUser.ID,
 			Slug:     "not-exist-slug",
 		}, {
-			AuthorID: dUser.ID + 1,
+			AuthorID: dUser.ID + 1000,
 			Slug:     article.Slug,
+		}, {
+			AuthorID: dUser.ID,
+			Slug:     article2.Slug,
 		},
 	}
 

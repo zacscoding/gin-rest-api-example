@@ -44,6 +44,27 @@ func (_m *ArticleDB) DeleteCommentById(ctx context.Context, authorId uint, slug 
 	return r0
 }
 
+// DeleteComments provides a mock function with given fields: ctx, authorId, slug
+func (_m *ArticleDB) DeleteComments(ctx context.Context, authorId uint, slug string) (int64, error) {
+	ret := _m.Called(ctx, authorId, slug)
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(context.Context, uint, string) int64); ok {
+		r0 = rf(ctx, authorId, slug)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, uint, string) error); ok {
+		r1 = rf(ctx, authorId, slug)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // FindArticleBySlug provides a mock function with given fields: ctx, slug
 func (_m *ArticleDB) FindArticleBySlug(ctx context.Context, slug string) (*model.Article, error) {
 	ret := _m.Called(ctx, slug)
@@ -118,6 +139,20 @@ func (_m *ArticleDB) FindComments(ctx context.Context, slug string) ([]*model.Co
 	}
 
 	return r0, r1
+}
+
+// RunInTx provides a mock function with given fields: ctx, f
+func (_m *ArticleDB) RunInTx(ctx context.Context, f func(context.Context) error) error {
+	ret := _m.Called(ctx, f)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, func(context.Context) error) error); ok {
+		r0 = rf(ctx, f)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // SaveArticle provides a mock function with given fields: ctx, article

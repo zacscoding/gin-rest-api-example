@@ -22,7 +22,8 @@ func TestLoad(t *testing.T) {
 	assert.Equal(t, defaultConfig["jwt.sessionTime"].(int), cfg.JwtConfig.SessionTime)
 	// db configs
 	assert.Equal(t, defaultConfig["db.dataSourceName"].(string), cfg.DBConfig.DataSourceName)
-	assert.Equal(t, defaultConfig["db.createTable"].(bool), cfg.DBConfig.Migrate)
+	assert.Equal(t, defaultConfig["db.migrate.enable"].(bool), cfg.DBConfig.Migrate.Enable)
+	assert.Equal(t, defaultConfig["db.migrate.dir"].(bool), cfg.DBConfig.Migrate.Dir)
 	assert.Equal(t, defaultConfig["db.pool.maxOpen"].(int), cfg.DBConfig.Pool.MaxOpen)
 	assert.Equal(t, defaultConfig["db.pool.maxIdle"].(int), cfg.DBConfig.Pool.MaxIdle)
 	assert.Equal(t, defaultConfig["db.pool.maxLifetime"].(int), cfg.DBConfig.Pool.MaxLifetime)

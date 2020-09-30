@@ -32,8 +32,8 @@ func NewDatabase(cfg *config.Config) (*gorm.DB, error) {
 	origin.SetMaxIdleConns(cfg.DBConfig.Pool.MaxIdle)
 	origin.SetConnMaxLifetime(time.Duration(cfg.DBConfig.Pool.MaxLifetime) * time.Second)
 
-	if cfg.DBConfig.Migrate {
-		err := migrateDB(cfg.DBConfig.DataSourceName)
+	if cfg.DBConfig.Migrate.Enable {
+		err := migrateDB(cfg.DBConfig.DataSourceName, cfg.DBConfig.Migrate.Dir)
 		if err != nil {
 			return nil, err
 		}

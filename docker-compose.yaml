@@ -10,17 +10,19 @@ services:
       - MYSQL_DATABASE=local_db
     ports:
       - 3306:3306
-#  article-server:
-#    image: gin-example/article-server
-#    build:
-#      context: .
-#      dockerfile: cmd/server/Dockerfile
-#    container_name: article-server
-#    ports:
-#      - "3000:3000"
-#    volumes:
-#      - ./config/local.yaml:/bin/config.yaml
-#    command: article-server --conf /bin/config.yaml
-#    restart: always
-#    depends_on:
-#      - "db"
+    hostname: db
+  article-server:
+    image: gin-example/article-server
+    build:
+      context: .
+      dockerfile: cmd/server/Dockerfile
+    container_name: article-server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./config/local.yaml:/config/config.yaml
+      - ./migrations:/config/migrations
+    command: article-server --conf /config/config.yaml
+    restart: always
+    depends_on:
+      - "db"

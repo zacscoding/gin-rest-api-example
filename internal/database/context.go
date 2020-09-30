@@ -11,7 +11,7 @@ const dbKey = contextKey("db")
 
 // WithDB creates a new context with the provided db attached
 func WithDB(ctx context.Context, db *gorm.DB) context.Context {
-	return context.WithValue(ctx, db, db)
+	return context.WithValue(ctx, dbKey, db)
 }
 
 // FromContext returns db stored in the context if exist, otherwise returns given db

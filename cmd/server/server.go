@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"gin-rest-api-example/internal/account"
 	accountDB "gin-rest-api-example/internal/account/database"
+	"gin-rest-api-example/internal/article"
+	articleDB "gin-rest-api-example/internal/article/database"
 	"gin-rest-api-example/internal/config"
 	"gin-rest-api-example/internal/database"
 	"gin-rest-api-example/pkg/logging"
@@ -63,11 +65,15 @@ func runApplication() {
 			accountDB.NewAccountDB,
 			account.NewAuthMiddleware,
 			account.NewHandler,
+			// setup article packages
+			articleDB.NewArticleDB,
+			article.NewHandler,
 			// server
 			newServer,
 		),
 		fx.Invoke(
 			account.RouteV1,
+			article.RouteV1,
 			printAppInfo,
 		),
 	)

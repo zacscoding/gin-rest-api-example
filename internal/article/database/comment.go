@@ -75,7 +75,7 @@ func (a *articleDB) DeleteCommentById(ctx context.Context, authorId uint, slug s
 func (a *articleDB) DeleteComments(ctx context.Context, authorId uint, slug string) (int64, error) {
 	logger := logging.FromContext(ctx)
 	db := database.FromContext(ctx, a.db)
-	logger.Debugw("article.db.DeleteComments", "authorId", authorId, "slug")
+	logger.Debugw("article.db.DeleteComments", "authorId", authorId, "slug", slug)
 
 	chain := db.Where("author_id = ?", authorId).
 		Where("slug = ? AND deleted_at IS NULL", slug).

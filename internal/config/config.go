@@ -32,8 +32,11 @@ type JWTConfig struct {
 
 type DBConfig struct {
 	DataSourceName string `json:"dataSourceName"`
-	Migrate        bool   `json:"migrate"`
-	Pool           struct {
+	Migrate        struct {
+		Enable bool   `json:"enable"`
+		Dir    string `json:"dir"`
+	} `json:"migrate"`
+	Pool struct {
 		MaxOpen     int `json:"maxOpen"`
 		MaxIdle     int `json:"maxIdle"`
 		MaxLifetime int `json:"maxLifetime"`

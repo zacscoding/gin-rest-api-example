@@ -52,3 +52,13 @@ func ValidationErrorDetails(obj interface{}, tag string, errs validator.Validati
 	}
 	return errors
 }
+
+func NewValidationErrorDetails(field, message string, value interface{}) []*ValidationErrDetail {
+	return []*ValidationErrDetail{
+		{
+			Field:   field,
+			Value:   value,
+			Message: message,
+		},
+	}
+}

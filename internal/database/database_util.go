@@ -80,7 +80,7 @@ func NewTestDatabase(tb testing.TB, migration bool) *gorm.DB {
 	if !migration {
 		return gdb
 	}
-	err = migrateDB(dcn)
+	err = migrateDB(dcn, "")
 	if err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}
@@ -106,7 +106,7 @@ func DeleteRecordAll(_ testing.TB, db *gorm.DB, tableWhereClauses []string) erro
 	return nil
 }
 
-func migrateDB(dcn string) error {
+func migrateDB(dcn string, dir string) error {
 	db, err := sql.Open("mysql", dcn)
 	if err != nil {
 		return fmt.Errorf("failed create connect database: %w", err)
@@ -115,8 +115,11 @@ func migrateDB(dcn string) error {
 	if err != nil {
 		return fmt.Errorf("failed to mysql instance: %w", err)
 	}
+	if dir == "" {
+		dir = migrationDir()
+	}
 	m, err := migrate.NewWithDatabaseInstance(
-		fmt.Sprintf("file://%s", migrationDir()),
+		fmt.Sprintf("file://%s", dir),
 		"mysql",
 		driver,
 	)

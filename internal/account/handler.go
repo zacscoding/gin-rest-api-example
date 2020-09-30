@@ -56,9 +56,7 @@ func (h *Handler) signUp(c *gin.Context) {
 			if database.IsKeyConflictErr(err) {
 				return handler.NewErrorResponse(http.StatusConflict, handler.DuplicateEntry, "duplicate email address", nil)
 			}
-			return &handler.Response{
-				Err: err,
-			}
+			return handler.NewInternalErrorResponse(err)
 		}
 		return handler.NewSuccessResponse(http.StatusCreated, NewUserResponse(&acc))
 	})

@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"gin-rest-api-example/internal/account/model"
 	"gin-rest-api-example/internal/database"
 	"gin-rest-api-example/pkg/logging"
@@ -89,9 +88,8 @@ func (a *accountDB) FindByEmail(ctx context.Context, email string) (*model.Accou
 	return &acc, nil
 }
 
-// NewAccountDB create a new account db with given db
+// NewAccountDB creates a new account db with given db
 func NewAccountDB(db *gorm.DB) AccountDB {
-	fmt.Printf("account.database.NewAccountDB() is called. db: %p\n", db)
 	return &accountDB{
 		db: db,
 	}

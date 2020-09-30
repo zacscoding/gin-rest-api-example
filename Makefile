@@ -1,6 +1,6 @@
 MODULE = $(shell go list -m)
 
-.PHONY: generate build test lint build-docker  compose compose-down
+.PHONY: generate build test lint build-docker compose compose-down migrate
 generate:
 	go generate ./...
 
@@ -22,4 +22,8 @@ compose: # run with docker-compose
 
 compose-down: # down docker-compose
 	docker-compose down -v
+
+migrate:
+	docker run --rm -v migrations:/migrations --network host migrate/migrate -path=/migrations/ \
+	-database mysql://root:password@localhost:3306/local_db?charset=utf8&parseTime=True&multiStatements=true up 2
 

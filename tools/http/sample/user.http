@@ -72,7 +72,8 @@ Content-Type: application/json
   }
 }
 
+> {% client.global.set("auth_token", response.body.token); %}
+
 ### Current user
 GET http://localhost:3000/v1/api/user/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDEzMDYzNjksImlkIjoiemFjc2NvZGluZ0BnbWFpbC5jb20iLCJvcmlnX2lhdCI6MTYwMTMwNjI4M30.4bkZ49TGJYNofBe3of7RrIUbCYbOLYwKcHIlYrk-fJU
-Content-Type: application/json
+Authorization: Bearer {{auth_token}}
