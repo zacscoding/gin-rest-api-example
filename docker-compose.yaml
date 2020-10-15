@@ -11,6 +11,29 @@ services:
     ports:
       - 3306:3306
     hostname: db
+  # monitoring
+  influxdb:
+    image: influxdb
+    container_name: influxdb
+    ports:
+      - "8083:8083"
+      - "8086:8086"
+  telegraf:
+    image: telegraf
+    links:
+      - influxdb
+    volumes:
+      - ./config/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./config/grafana/conf/grafana.ini:/etc/grafana/grafana.ini
+      - ./config/grafana/provisioning:/etc/grafana/provisioning
+    links:
+      - influxdb
   article-server:
     image: gin-example/article-server
     build:
@@ -18,10 +41,21 @@ services:
       dockerfile: cmd/server/Dockerfile
     container_name: article-server
     ports:
-      - "3000:3000"
+      - "8080:8080"
     volumes:
       - ./config/local.yaml:/config/config.yaml
       - ./migrations:/config/migrations
+    command: article-server --conf /config/config.yaml
+    restart: always
+    depends_on:
+      - "db"
+  article-server2:
+    image: gin-example/article-server
+    container_name: article-server-2
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/local-2.yaml:/config/config.yaml
     command: article-server --conf /config/config.yaml
     restart: always
     depends_on:

@@ -16,6 +16,7 @@ require (
 	github.com/magiconair/properties v1.8.0
 	github.com/ory/dockertest/v3 v3.6.0
 	github.com/pkg/errors v0.8.1
+	github.com/prometheus/client_golang v0.9.3
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/testify v1.5.1
 	github.com/tidwall/gjson v1.6.0

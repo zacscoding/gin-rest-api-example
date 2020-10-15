@@ -13,9 +13,10 @@ import (
 )
 
 type Config struct {
-	ServerConfig ServerConfig `json:"server"`
-	JwtConfig    JWTConfig    `json:"jwt"`
-	DBConfig     DBConfig     `json:"db"`
+	ServerConfig  ServerConfig  `json:"server"`
+	JwtConfig     JWTConfig     `json:"jwt"`
+	DBConfig      DBConfig      `json:"db"`
+	MetricsConfig MetricsConfig `json:"metrics"`
 }
 
 type ServerConfig struct {
@@ -41,6 +42,11 @@ type DBConfig struct {
 		MaxIdle     int `json:"maxIdle"`
 		MaxLifetime int `json:"maxLifetime"`
 	} `json:"pool"`
+}
+
+type MetricsConfig struct {
+	Namespace string `json:"namespace"`
+	Subsystem string `json:"subsystem"`
 }
 
 func (c *DBConfig) MarshalJSON() ([]byte, error) {

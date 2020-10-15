@@ -1,7 +1,7 @@
 package config
 
 var defaultConfig = map[string]interface{}{
-	"server.port":             3000,
+	"server.port":             8080,
 	"server.timeoutSecs":      5,
 	"server.readTimeoutSecs":  5,
 	"server.writeTimeoutSecs": 30,
@@ -15,4 +15,7 @@ var defaultConfig = map[string]interface{}{
 	"db.pool.maxOpen":     50,
 	"db.pool.maxIdle":     5,
 	"db.pool.maxLifetime": 5,
+
+	"metrics.namespace": "article_server",
+	"metrics.subsystem": "",
 }

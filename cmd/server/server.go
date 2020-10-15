@@ -9,6 +9,7 @@ import (
 	articleDB "gin-rest-api-example/internal/article/database"
 	"gin-rest-api-example/internal/config"
 	"gin-rest-api-example/internal/database"
+	"gin-rest-api-example/internal/metric"
 	"gin-rest-api-example/pkg/logging"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
@@ -23,10 +24,14 @@ var serverCmd = &cobra.Command{
 	},
 }
 
-func newServer(lc fx.Lifecycle, cfg *config.Config) *gin.Engine {
+func newServer(lc fx.Lifecycle, cfg *config.Config, mp *metric.MetricsProvider) *gin.Engine {
 	gin.SetMode(gin.DebugMode)
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery())
+
+	metric.Route(r)
+	r.Use(metric.MetricsMiddleware(mp))
+
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", cfg.ServerConfig.Port),
 		Handler: r,
@@ -59,6 +64,7 @@ func runApplication() {
 		fx.Provide(
 			// load config
 			loadConfig,
+			metric.NewMetricsProvider,
 			// setup database
 			database.NewDatabase,
 			// setup account packages

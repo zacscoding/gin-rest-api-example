@@ -1,0 +1,12 @@
+# config file version
+apiVersion: 1
+
+providers:
+  - name: article-server-dashboard
+    type: file
+    disableDeletion: false
+    editable: true
+    allowUiUpdates: true
+    folder: ''
+    options:
+      path: /etc/grafana/provisioning/dashboards

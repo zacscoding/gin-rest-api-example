@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 9090
   timeoutSecs: 10
   readTimeoutSecs: 15
   writeTimeoutSecs: 15
@@ -9,8 +9,7 @@ jwt:
 db:
   dataSourceName: root:password@tcp(db)/local_db?charset=utf8&parseTime=True&multiStatements=true
   migrate:
-    enable: true
-    dir: /config/migrations
+    enable: false
   pool:
     maxOpen: 50
     maxIdle: 5

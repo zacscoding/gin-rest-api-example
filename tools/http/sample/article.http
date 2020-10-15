@@ -1,5 +1,5 @@
 ### Get auth token
-POST http://localhost:3000/v1/api/users/login
+POST http://localhost:8080/v1/api/users/login
 Content-Type: application/json
 
 {
@@ -12,7 +12,7 @@ Content-Type: application/json
 > {% client.global.set("article_auth_token", response.body.token); %}
 
 ### Save a article
-POST http://localhost:3000/v1/api/articles
+POST http://localhost:8080/v1/api/articles
 Authorization: Bearer {{article_auth_token}}
 Content-Type: application/json
 
@@ -26,15 +26,15 @@ Content-Type: application/json
 }
 
 ### Get a article by slug
-GET http://localhost:3000/v1/api/articles/how-to-train-your-dragon
+GET http://localhost:8080/v1/api/articles/how-to-train-your-dragon
 Content-Type: application/json
 
 ### Get articles
-GET http://localhost:3000/v1/api/articles?tag=reactjs
+GET http://localhost:8080/v1/api/articles?tag=reactjs
 Content-Type: application/json
 
 ### Save a comment
-POST http://localhost:3000/v1/api/articles/how-to-train-your-dragon/comments
+POST http://localhost:8080/v1/api/articles/how-to-train-your-dragon/comments
 Authorization: Bearer {{article_auth_token}}
 Content-Type: application/json
 
@@ -45,13 +45,13 @@ Content-Type: application/json
 }
 
 ### Get comments
-GET http://localhost:3000/v1/api/articles/how-to-train-your-dragon/comments
+GET http://localhost:8080/v1/api/articles/how-to-train-your-dragon/comments
 
 
 ### Delete acomments
-DELETE http://localhost:3000/v1/api/articles/how-to-train-your-dragon/comments/1
+DELETE http://localhost:8080/v1/api/articles/how-to-train-your-dragon/comments/1
 Authorization: Bearer {{article_auth_token}}
 
 ### Delete a article
-DELETE http://localhost:3000/v1/api/articles/how-to-train-your-dragon
+DELETE http://localhost:8080/v1/api/articles/how-to-train-your-dragon
 Authorization: Bearer {{article_auth_token}}

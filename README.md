@@ -55,5 +55,6 @@ Run intellij's .http files in `tools/http/sample directory`(./tools/http/sample)
 - [x] impl article handler
 - [ ] refactor binding and validation of request
 - [x] configure docker compose
+- [ ] add metrics
 - [ ] configure tests (newman or http)
 - [ ] another project layer with different branch

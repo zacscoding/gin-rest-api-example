@@ -27,6 +27,9 @@ func TestLoad(t *testing.T) {
 	assert.Equal(t, defaultConfig["db.pool.maxOpen"].(int), cfg.DBConfig.Pool.MaxOpen)
 	assert.Equal(t, defaultConfig["db.pool.maxIdle"].(int), cfg.DBConfig.Pool.MaxIdle)
 	assert.Equal(t, defaultConfig["db.pool.maxLifetime"].(int), cfg.DBConfig.Pool.MaxLifetime)
+	// metrics configs
+	assert.Equal(t, defaultConfig["metrics.namespace"].(string), cfg.MetricsConfig.Namespace)
+	assert.Equal(t, defaultConfig["metrics.subsystem"].(string), cfg.MetricsConfig.Subsystem)
 }
 
 func TestLoadWithEnv(t *testing.T) {
