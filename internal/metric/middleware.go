@@ -16,7 +16,7 @@ func MetricsMiddleware(mp *MetricsProvider) gin.HandlerFunc {
 		start := time.Now()
 		c.Next()
 		elapsed := time.Now().Sub(start)
-		logging.DefaultLogger().Infow("## Called code:%d, method:%s, path:%s, elapsed:%v", c.Writer.Status(), c.Request.Method, c.FullPath(), elapsed)
+		logging.DefaultLogger().Infof("## Called code:%d, method:%s, path:%s, elapsed:%v", c.Writer.Status(), c.Request.Method, c.FullPath(), elapsed)
 		var (
 			code   = c.Writer.Status()
 			method = c.Request.Method
