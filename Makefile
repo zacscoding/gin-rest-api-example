@@ -17,10 +17,10 @@ lint:
 build-docker: # build docker image
 	docker build -f cmd/server/Dockerfile -t gin-example/article-server .
 
-compose: # run with docker-compose
+compose.up: # run with docker-compose
 	docker-compose up --force-recreate
 
-compose-down: # down docker-compose
+compose.down: # down docker-compose
 	docker-compose down -v
 
 migrate:

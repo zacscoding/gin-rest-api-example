@@ -32,12 +32,14 @@ $ make build-docker
 
 ```bash
 // docker-compose up --force-recreate
-$ make compose
+$ make compose.up
 
 $  docker ps -a
 CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS                               NAMES
 e01564708984        gin-example/article-server   "article-server --co…"   40 seconds ago      Up 39 seconds       0.0.0.0:3000->3000/tcp              article-server
 105cb25b6d3a        mysql:8.0.17                 "docker-entrypoint.s…"   40 seconds ago      Up 39 seconds       0.0.0.0:3306->3306/tcp, 33060/tcp   my-mysql
+
+$ make compose.down
 ```  
 
 > #### Check apis  
