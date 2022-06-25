@@ -55,7 +55,7 @@ func TestHandleRequest(t *testing.T) {
 			Body: `
 			{
 				"code": "InternalServerError",
-				"message": "[InternalServerError]"
+				"message": "[InternalServerError] An error has occurred, please try again later"
 			}
 			`,
 		}, {

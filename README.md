@@ -1,3 +1,5 @@
+![workflow](https://github.com/zacscoding/gin-rest-api-example/actions/workflows/check.yaml/badge.svg)
+
 # Rest API with golang and gin, gorm  
 This project is an exemplary rest api server built with Go :)  
 

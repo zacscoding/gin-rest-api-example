@@ -4,6 +4,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"runtime"
+	"testing"
+	"time"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/mysql"
@@ -11,12 +18,6 @@ import (
 	gMysql "gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"log"
-	"os"
-	"path/filepath"
-	"runtime"
-	"testing"
-	"time"
 
 	"github.com/ory/dockertest/v3"
 )
@@ -35,9 +36,14 @@ func NewTestDatabase(tb testing.TB, migration bool) *gorm.DB {
 	}
 
 	// pulls an image, creates a container based on it and runs it
-	resource, err := pool.Run("mysql", "8.0.17", []string{"MYSQL_ROOT_PASSWORD=secret"})
+	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
+		//Platform:   "linux/x86_64",
+		Repository: "mysql",
+		Tag:        "8.0.29",
+		Env:        []string{"MYSQL_ROOT_PASSWORD=secret"},
+	})
 	if err != nil {
-		tb.Fatalf("Failed to not start resource: %v", err)
+		tb.Fatalf("Failed to start resource: %v", err)
 	}
 	err = resource.Expire(60 * 5)
 
