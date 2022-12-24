@@ -5,11 +5,12 @@ import (
 	"gin-rest-api-example/internal/account/model"
 	"gin-rest-api-example/internal/config"
 	"gin-rest-api-example/pkg/logging"
+	"net/http"
+	"time"
+
 	"github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
-	"net/http"
-	"time"
 )
 
 var identityKey = "id"
@@ -42,7 +43,7 @@ func NewAuthMiddleware(cfg *config.Config, accountDB accountDB.AccountDB) (*jwt.
 	return jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte(cfg.JwtConfig.Secret),
-		Timeout:     time.Duration(cfg.JwtConfig.SessionTime) * time.Millisecond,
+		Timeout:     cfg.JwtConfig.SessionTime,
 		MaxRefresh:  time.Hour,
 		IdentityKey: identityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {

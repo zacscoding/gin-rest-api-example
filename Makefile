@@ -17,11 +17,9 @@ lint:
 build-docker: # build docker image
 	docker build -f cmd/server/Dockerfile -t gin-example/article-server .
 
-compose.up: # run with docker-compose
-	docker-compose up --force-recreate
-
-compose.down: # down docker-compose
-	docker-compose down -v
+compose.%:
+	$(eval CMD = ${subst compose.,,$(@)})
+	tools/script/compose.sh $(CMD)
 
 migrate:
 	docker run --rm -v migrations:/migrations --network host migrate/migrate -path=/migrations/ \

@@ -17,7 +17,7 @@ function build(){
 }
 
 function up(){
-  cd "${COMPOSE_PATH}" && docker-compose up --force-recreate
+  cd "${COMPOSE_PATH}" && docker-compose up -d --force-recreate
 }
 
 function down(){

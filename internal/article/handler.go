@@ -11,14 +11,14 @@ import (
 	"gin-rest-api-example/internal/middleware/handler"
 	"gin-rest-api-example/pkg/logging"
 	"gin-rest-api-example/pkg/validate"
+	"net/http"
+	"strconv"
+
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/gosimple/slug"
 	"github.com/pkg/errors"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 type Handler struct {
@@ -191,8 +191,7 @@ func (h *Handler) deleteArticle(c *gin.Context) {
 
 func RouteV1(cfg *config.Config, h *Handler, r *gin.Engine, auth *jwt.GinJWTMiddleware) {
 	v1 := r.Group("v1/api")
-	timeout := time.Duration(cfg.ServerConfig.WriteTimeoutSecs) * time.Second
-	v1.Use(middleware.RequestIDMiddleware(), middleware.TimeoutMiddleware(timeout))
+	v1.Use(middleware.RequestIDMiddleware(), middleware.TimeoutMiddleware(cfg.ServerConfig.WriteTimeout))
 
 	articleV1 := v1.Group("articles")
 	// anonymous

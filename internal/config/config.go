@@ -2,33 +2,44 @@ package config
 
 import (
 	"encoding/json"
+	"log"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"time"
+
+	"github.com/jeremywohl/flatten"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/confmap"
 	"github.com/knadh/koanf/providers/env"
 	"github.com/knadh/koanf/providers/file"
-	"log"
-	"path/filepath"
-	"strings"
 )
 
 type Config struct {
 	ServerConfig  ServerConfig  `json:"server"`
+	Logging       LoggingConfig `json:"logging" yaml:"logging"`
 	JwtConfig     JWTConfig     `json:"jwt"`
 	DBConfig      DBConfig      `json:"db"`
 	MetricsConfig MetricsConfig `json:"metrics"`
 }
 
 type ServerConfig struct {
-	Port             int `json:"port"`
-	TimeoutSecs      int `json:"timeoutSecs"`
-	ReadTimeoutSecs  int `json:"readTimeoutSecs"`
-	WriteTimeoutSecs int `json:"writeTimeoutSecs"`
+	Port             int           `json:"port"`
+	ReadTimeout      time.Duration `json:"readTimeout"`
+	WriteTimeout     time.Duration `json:"writeTimeout"`
+	GracefulShutdown time.Duration `json:"gracefulShutdown"`
+}
+
+type LoggingConfig struct {
+	Level       int    `json:"level"`
+	Encoding    string `json:"encoding"`
+	Development bool   `json:"development"`
 }
 
 type JWTConfig struct {
-	Secret      string `json:"secret"`
-	SessionTime int    `json:"sessionTime"`
+	Secret      string        `json:"secret"`
+	SessionTime time.Duration `json:"sessionTime"`
 }
 
 type DBConfig struct {
@@ -38,28 +49,15 @@ type DBConfig struct {
 		Dir    string `json:"dir"`
 	} `json:"migrate"`
 	Pool struct {
-		MaxOpen     int `json:"maxOpen"`
-		MaxIdle     int `json:"maxIdle"`
-		MaxLifetime int `json:"maxLifetime"`
+		MaxOpen     int           `json:"maxOpen"`
+		MaxIdle     int           `json:"maxIdle"`
+		MaxLifetime time.Duration `json:"maxLifetime"`
 	} `json:"pool"`
 }
 
 type MetricsConfig struct {
 	Namespace string `json:"namespace"`
 	Subsystem string `json:"subsystem"`
-}
-
-func (c *DBConfig) MarshalJSON() ([]byte, error) {
-	m := map[string]interface{}{
-		"dataSourceName": "[PROTECTED]", // TODO : masking
-		"pool": map[string]interface{}{
-			"maxOpen":     c.Pool.MaxOpen,
-			"maxIdle":     c.Pool.MaxIdle,
-			"maxLifetime": c.Pool.MaxLifetime,
-		},
-		"migrate": c.Migrate,
-	}
-	return json.Marshal(m)
 }
 
 func Load(configPath string) (*Config, error) {
@@ -101,4 +99,64 @@ func Load(configPath string) (*Config, error) {
 		return nil, err
 	}
 	return &cfg, err
+}
+
+func (c *Config) MarshalJSON() ([]byte, error) {
+	type conf Config
+	alias := conf(*c)
+
+	data, err := json.Marshal(&alias)
+	if err != nil {
+		return nil, err
+	}
+
+	flat, err := flatten.FlattenString(string(data), "", flatten.DotStyle)
+	if err != nil {
+		return nil, err
+	}
+
+	var m map[string]interface{}
+	err = json.Unmarshal([]byte(flat), &m)
+	if err != nil {
+		return nil, err
+	}
+
+	maskKeys := map[string]struct{}{
+		// add keys if u want to mask some properties.
+		"jwt.secret": {},
+	}
+
+	for key, val := range m {
+		if v, ok := val.(string); ok {
+			m[key] = maskPassword(v)
+		}
+		if _, ok := maskKeys[key]; ok {
+			switch v := val.(type) {
+			case string:
+				if v != "" {
+					m[key] = "****"
+				}
+			default:
+				m[key] = "****"
+			}
+		}
+	}
+	return json.Marshal(&m)
+}
+
+func maskPassword(val string) string {
+	if val == "" {
+		return ""
+	}
+	regex := regexp.MustCompile(`^(?P<protocol>.+?//)?(?P<username>.+?):(?P<password>.+?)@(?P<address>.+)$`)
+	if !regex.MatchString(val) {
+		return val
+	}
+	matches := regex.FindStringSubmatch(val)
+	for i, v := range regex.SubexpNames() {
+		if "password" == v {
+			val = strings.ReplaceAll(val, matches[i], "****")
+		}
+	}
+	return val
 }

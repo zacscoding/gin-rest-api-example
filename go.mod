@@ -12,6 +12,7 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/gosimple/slug v1.9.0
+	github.com/jeremywohl/flatten v1.0.1
 	github.com/knadh/koanf v0.13.0
 	github.com/magiconair/properties v1.8.1
 	github.com/ory/dockertest/v3 v3.9.1
@@ -20,7 +21,7 @@ require (
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.1
 	github.com/tidwall/gjson v1.6.0
-	go.uber.org/fx v1.13.1
+	go.uber.org/fx v1.18.2
 	go.uber.org/zap v1.17.0
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
 	gorm.io/driver/mysql v1.0.1

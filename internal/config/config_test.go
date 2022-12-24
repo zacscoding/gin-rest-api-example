@@ -1,35 +1,43 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
+	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLoad(t *testing.T) {
 	cfg, err := Load("")
-
 	assert.NoError(t, err)
+
 	// server configs
-	assert.Equal(t, defaultConfig["server.port"].(int), cfg.ServerConfig.Port)
-	assert.Equal(t, defaultConfig["server.timeoutSecs"].(int), cfg.ServerConfig.TimeoutSecs)
-	assert.Equal(t, defaultConfig["server.readTimeoutSecs"].(int), cfg.ServerConfig.ReadTimeoutSecs)
-	assert.Equal(t, defaultConfig["server.writeTimeoutSecs"].(int), cfg.ServerConfig.WriteTimeoutSecs)
+	equal(t, 8080, defaultConfig["server.port"], cfg.ServerConfig.Port)
+	equalDuration(t, 5*time.Second, defaultConfig["server.readTimeout"], cfg.ServerConfig.ReadTimeout)
+	equalDuration(t, 10*time.Second, defaultConfig["server.writeTimeout"], cfg.ServerConfig.WriteTimeout)
+	equalDuration(t, 30*time.Second, defaultConfig["server.gracefulShutdown"], cfg.ServerConfig.GracefulShutdown)
+	// logging configs
+	equal(t, -1, defaultConfig["logging.level"], cfg.Logging.Level)
+	equal(t, "console", defaultConfig["logging.encoding"], cfg.Logging.Encoding)
+	equal(t, true, defaultConfig["logging.development"], cfg.Logging.Development)
 	// jwt configs
-	assert.Equal(t, defaultConfig["jwt.secret"].(string), cfg.JwtConfig.Secret)
-	assert.Equal(t, defaultConfig["jwt.sessionTime"].(int), cfg.JwtConfig.SessionTime)
+	equal(t, "secret-key", defaultConfig["jwt.secret"], cfg.JwtConfig.Secret)
+	equalDuration(t, 864000*time.Second, defaultConfig["jwt.sessionTime"], cfg.JwtConfig.SessionTime)
 	// db configs
-	assert.Equal(t, defaultConfig["db.dataSourceName"].(string), cfg.DBConfig.DataSourceName)
-	assert.Equal(t, defaultConfig["db.migrate.enable"].(bool), cfg.DBConfig.Migrate.Enable)
-	assert.Equal(t, defaultConfig["db.migrate.dir"].(string), cfg.DBConfig.Migrate.Dir)
-	assert.Equal(t, defaultConfig["db.pool.maxOpen"].(int), cfg.DBConfig.Pool.MaxOpen)
-	assert.Equal(t, defaultConfig["db.pool.maxIdle"].(int), cfg.DBConfig.Pool.MaxIdle)
-	assert.Equal(t, defaultConfig["db.pool.maxLifetime"].(int), cfg.DBConfig.Pool.MaxLifetime)
-	// metrics configs
-	assert.Equal(t, defaultConfig["metrics.namespace"].(string), cfg.MetricsConfig.Namespace)
-	assert.Equal(t, defaultConfig["metrics.subsystem"].(string), cfg.MetricsConfig.Subsystem)
+	equal(t, "root:password@tcp(127.0.0.1:3306)/local_db?charset=utf8&parseTime=True&multiStatements=true", defaultConfig["db.dataSourceName"], cfg.DBConfig.DataSourceName)
+	equal(t, false, defaultConfig["db.migrate.enable"], cfg.DBConfig.Migrate.Enable)
+	equal(t, "", defaultConfig["db.migrate.dir"], cfg.DBConfig.Migrate.Dir)
+	equal(t, 10, defaultConfig["db.pool.maxOpen"], cfg.DBConfig.Pool.MaxOpen)
+	equal(t, 5, defaultConfig["db.pool.maxIdle"], cfg.DBConfig.Pool.MaxIdle)
+	equalDuration(t, 5*time.Minute, defaultConfig["db.pool.maxLifetime"], cfg.DBConfig.Pool.MaxLifetime)
+	//// metrics configs
+	equal(t, "article_server", defaultConfig["metrics.namespace"], cfg.MetricsConfig.Namespace)
+	equal(t, "", defaultConfig["metrics.subsystem"], cfg.MetricsConfig.Subsystem)
 }
 
 func TestLoadWithEnv(t *testing.T) {
@@ -68,4 +76,34 @@ server:
 	// then
 	assert.NoError(t, err)
 	assert.Equal(t, 5000, cfg.ServerConfig.Port)
+}
+
+func TestMarshalJSON(t *testing.T) {
+	conf, err := Load("")
+	assert.NoError(t, err)
+	data, err := json.Marshal(conf)
+	assert.NoError(t, err)
+
+	var configMap map[string]interface{}
+	assert.NoError(t, json.Unmarshal(data, &configMap))
+	assert.True(t, strings.HasPrefix(configMap["db.dataSourceName"].(string), "root:****@tcp"))
+	assert.Equal(t, "****", configMap["jwt.secret"])
+}
+
+func equal(t *testing.T, expected interface{}, values ...interface{}) {
+	for _, v := range values {
+		assert.EqualValues(t, expected, v)
+	}
+}
+
+func equalDuration(t *testing.T, expected time.Duration, values ...interface{}) {
+	for _, v := range values {
+		if str, ok := v.(string); ok {
+			d, err := time.ParseDuration(str)
+			assert.NoError(t, err)
+			assert.EqualValues(t, expected, d)
+			continue
+		}
+		assert.EqualValues(t, expected, v)
+	}
 }

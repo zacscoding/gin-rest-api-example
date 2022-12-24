@@ -1,12 +1,12 @@
 ### Invalid user registration - 1
-POST http://localhost:3000/v1/api/users
+POST http://localhost:8080/v1/api/users
 Content-Type: application/json
 
 {
 }
 
 ### Invalid user registration - 2
-POST http://localhost:3000/v1/api/users
+POST http://localhost:8080/v1/api/users
 Content-Type: application/json
 
 {
@@ -16,7 +16,7 @@ Content-Type: application/json
 }
 
 ### Invalid user registration - 3
-POST http://localhost:3000/v1/api/users
+POST http://localhost:8080/v1/api/users
 Content-Type: application/json
 
 {
@@ -27,7 +27,7 @@ Content-Type: application/json
 }
 
 ### Invalid user registration - 4
-POST http://localhost:3000/v1/api/users
+POST http://localhost:8080/v1/api/users
 Content-Type: application/json
 
 {
@@ -38,7 +38,7 @@ Content-Type: application/json
 }
 
 ### Invalid user registration - 5
-POST http://localhost:3000/v1/api/users
+POST http://localhost:8080/v1/api/users
 Content-Type: application/json
 
 {
@@ -50,7 +50,7 @@ Content-Type: application/json
 }
 
 ### Valid user registration
-POST http://localhost:3000/v1/api/users
+POST http://localhost:8080/v1/api/users
 Content-Type: application/json
 
 {
@@ -62,7 +62,7 @@ Content-Type: application/json
 }
 
 ### Sign in
-POST http://localhost:3000/v1/api/users/login
+POST http://localhost:8080/v1/api/users/login
 Content-Type: application/json
 
 {
@@ -75,5 +75,5 @@ Content-Type: application/json
 > {% client.global.set("auth_token", response.body.token); %}
 
 ### Current user
-GET http://localhost:3000/v1/api/user/me
+GET http://localhost:8080/v1/api/user/me
 Authorization: Bearer {{auth_token}}

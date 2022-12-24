@@ -2,10 +2,11 @@ package logging
 
 import (
 	"context"
+	"sync"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"sync"
 )
 
 type contextKey = string
@@ -13,26 +14,47 @@ type contextKey = string
 const loggerKey = contextKey("logger")
 
 var (
-	level = zapcore.Level(-1)
 	// defaultLogger is the default logger. It is initialized once per package
 	// include upon calling DefaultLogger.
 	defaultLogger     *zap.SugaredLogger
 	defaultLoggerOnce sync.Once
 )
 
+var conf = &Config{
+	Encoding:    "console",
+	Level:       zapcore.InfoLevel,
+	Development: true,
+}
+
+type Config struct {
+	Encoding    string
+	Level       zapcore.Level
+	Development bool
+}
+
+// SetConfig sets given logging configs for DefaultLogger's logger.
+// Must set configs before calling DefaultLogger()
+func SetConfig(c *Config) {
+	conf = &Config{
+		Encoding:    c.Encoding,
+		Level:       c.Level,
+		Development: c.Development,
+	}
+}
+
 func SetLevel(l zapcore.Level) {
-	level = l
+	conf.Level = l
 }
 
 // NewLogger creates a new logger with the given log level
-func NewLogger(level zapcore.Level) *zap.SugaredLogger {
+func NewLogger(conf *Config) *zap.SugaredLogger {
 	ec := zap.NewProductionEncoderConfig()
 	ec.EncodeTime = zapcore.ISO8601TimeEncoder
 	cfg := zap.Config{
-		Encoding:         "console",
+		Encoding:         conf.Encoding,
 		EncoderConfig:    ec,
-		Level:            zap.NewAtomicLevelAt(level),
-		Development:      false,
+		Level:            zap.NewAtomicLevelAt(conf.Level),
+		Development:      conf.Development,
 		OutputPaths:      []string{"stdout"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
@@ -46,7 +68,7 @@ func NewLogger(level zapcore.Level) *zap.SugaredLogger {
 // DefaultLogger returns the default logger for the package.
 func DefaultLogger() *zap.SugaredLogger {
 	defaultLoggerOnce.Do(func() {
-		defaultLogger = NewLogger(level)
+		defaultLogger = NewLogger(conf)
 	})
 	return defaultLogger
 }

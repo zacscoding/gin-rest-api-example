@@ -2,10 +2,11 @@ package metric
 
 import (
 	"gin-rest-api-example/internal/config"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"strconv"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 type MetricsProvider struct {
@@ -25,7 +26,7 @@ func (mp *MetricsProvider) RecordApiCount(code int, method, path string) {
 	mp.apiMetricsProvider.requestCounter.WithLabelValues(strconv.Itoa(code), method, path).Inc()
 }
 
-// RecordApiCount observes given elapsed mills with given code, method, path labels
+// RecordApiLatency observes given elapsed mills with given code, method, path labels
 func (mp *MetricsProvider) RecordApiLatency(code int, method, path string, elapsed time.Duration) {
 	mills := float64(elapsed.Milliseconds())
 	mp.apiMetricsProvider.requestLatency.WithLabelValues(strconv.Itoa(code), method, path).Observe(mills)
