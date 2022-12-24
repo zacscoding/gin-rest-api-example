@@ -12,6 +12,7 @@ jwt:
   sessionTime: 86400s
 db:
   dataSourceName: root:password@tcp(db)/local_db?charset=utf8&parseTime=True&multiStatements=true
+  logLevel: 1
   migrate:
     enable: false
   pool:

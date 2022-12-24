@@ -30,6 +30,7 @@ func TestLoad(t *testing.T) {
 	equalDuration(t, 864000*time.Second, defaultConfig["jwt.sessionTime"], cfg.JwtConfig.SessionTime)
 	// db configs
 	equal(t, "root:password@tcp(127.0.0.1:3306)/local_db?charset=utf8&parseTime=True&multiStatements=true", defaultConfig["db.dataSourceName"], cfg.DBConfig.DataSourceName)
+	equal(t, 1, defaultConfig["db.logLevel"], cfg.DBConfig.LogLevel)
 	equal(t, false, defaultConfig["db.migrate.enable"], cfg.DBConfig.Migrate.Enable)
 	equal(t, "", defaultConfig["db.migrate.dir"], cfg.DBConfig.Migrate.Dir)
 	equal(t, 10, defaultConfig["db.pool.maxOpen"], cfg.DBConfig.Pool.MaxOpen)

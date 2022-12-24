@@ -11,6 +11,7 @@ import (
 	"gin-rest-api-example/internal/config"
 	"gin-rest-api-example/internal/database"
 	"gin-rest-api-example/internal/metric"
+	"gin-rest-api-example/internal/middleware"
 	"gin-rest-api-example/pkg/logging"
 	"log"
 	"net/http"
@@ -81,7 +82,7 @@ func runApplication() {
 func newServer(lc fx.Lifecycle, cfg *config.Config, mp *metric.MetricsProvider) *gin.Engine {
 	gin.SetMode(gin.DebugMode)
 	r := gin.New()
-	r.Use(gin.Logger(), gin.Recovery())
+	r.Use(middleware.LoggingMiddleware("/metric"), gin.Recovery())
 
 	metric.Route(r)
 	r.Use(metric.MetricsMiddleware(mp))
@@ -95,11 +96,15 @@ func newServer(lc fx.Lifecycle, cfg *config.Config, mp *metric.MetricsProvider) 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			logging.FromContext(ctx).Infof("Start to rest api server :%d", cfg.ServerConfig.Port)
-			go srv.ListenAndServe()
+			go func() {
+				if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+					logging.DefaultLogger().Errorw("failed to close http server", "err", err)
+				}
+			}()
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			logging.FromContext(ctx).Infof("Stopped rest api server")
+			logging.FromContext(ctx).Info("Stopped rest api server")
 			return srv.Shutdown(ctx)
 		},
 	})

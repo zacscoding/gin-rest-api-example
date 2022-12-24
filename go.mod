@@ -19,11 +19,11 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.1
 	github.com/spf13/cobra v1.1.3
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.8.0
 	github.com/tidwall/gjson v1.6.0
 	go.uber.org/fx v1.18.2
-	go.uber.org/zap v1.17.0
+	go.uber.org/zap v1.23.0
 	golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
-	gorm.io/driver/mysql v1.0.1
-	gorm.io/gorm v1.20.0
+	gorm.io/driver/mysql v1.4.4
+	gorm.io/gorm v1.24.0
 )

@@ -14,6 +14,7 @@ var defaultConfig = map[string]interface{}{
 	"jwt.sessionTime": "864000s",
 
 	"db.dataSourceName":   "root:password@tcp(127.0.0.1:3306)/local_db?charset=utf8&parseTime=True&multiStatements=true",
+	"db.logLevel":         1,
 	"db.migrate.enable":   false,
 	"db.migrate.dir":      "",
 	"db.pool.maxOpen":     10,

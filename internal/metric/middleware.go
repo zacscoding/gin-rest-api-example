@@ -1,10 +1,10 @@
 package metric
 
 import (
-	"gin-rest-api-example/pkg/logging"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"time"
 )
 
 func Route(r *gin.Engine) {
@@ -16,7 +16,6 @@ func MetricsMiddleware(mp *MetricsProvider) gin.HandlerFunc {
 		start := time.Now()
 		c.Next()
 		elapsed := time.Now().Sub(start)
-		logging.DefaultLogger().Infof("## Called code:%d, method:%s, path:%s, elapsed:%v", c.Writer.Status(), c.Request.Method, c.FullPath(), elapsed)
 		var (
 			code   = c.Writer.Status()
 			method = c.Request.Method

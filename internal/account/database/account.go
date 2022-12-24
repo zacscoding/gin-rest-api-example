@@ -5,6 +5,7 @@ import (
 	"gin-rest-api-example/internal/account/model"
 	"gin-rest-api-example/internal/database"
 	"gin-rest-api-example/pkg/logging"
+
 	"gorm.io/gorm"
 )
 
@@ -18,6 +19,13 @@ type AccountDB interface {
 
 	// FindByEmail returns an account with given email if exist
 	FindByEmail(ctx context.Context, email string) (*model.Account, error)
+}
+
+// NewAccountDB creates a new account db with given db
+func NewAccountDB(db *gorm.DB) AccountDB {
+	return &accountDB{
+		db: db,
+	}
 }
 
 type accountDB struct {
@@ -86,11 +94,4 @@ func (a *accountDB) FindByEmail(ctx context.Context, email string) (*model.Accou
 		return nil, err
 	}
 	return &acc, nil
-}
-
-// NewAccountDB creates a new account db with given db
-func NewAccountDB(db *gorm.DB) AccountDB {
-	return &accountDB{
-		db: db,
-	}
 }

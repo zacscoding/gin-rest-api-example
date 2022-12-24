@@ -4,10 +4,11 @@ import (
 	"context"
 	"gin-rest-api-example/pkg/logging"
 	"gin-rest-api-example/pkg/trace"
-	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 const (
@@ -44,5 +45,55 @@ func TimeoutMiddleware(timeout time.Duration) gin.HandlerFunc {
 		}()
 		c.Request = c.Request.WithContext(ctx)
 		c.Next()
+	}
+}
+
+// LoggingMiddleware use logging.DefaultLogger() i.e *zap.SugaredLogger with x-request-id
+func LoggingMiddleware(skipPaths ...string) gin.HandlerFunc {
+	skip := make(map[string]struct{}, len(skipPaths))
+	for _, path := range skipPaths {
+		skip[path] = struct{}{}
+	}
+
+	return func(c *gin.Context) {
+		// skip logging
+		if _, ok := skip[c.FullPath()]; ok {
+			c.Next()
+			return
+		}
+
+		start := time.Now()
+		path := c.Request.URL.Path
+		rawQuery := c.Request.URL.RawQuery
+
+		// process request
+		c.Next()
+
+		logger := logging.FromContext(c.Request.Context())
+		timestamp := time.Now()
+		latency := timestamp.Sub(start)
+		latencyValue := latency.String()
+		clientIP := c.ClientIP()
+		method := c.Request.Method
+		status := c.Writer.Status()
+		if rawQuery != "" {
+			path = path + "?" + rawQuery
+		}
+		// append logger keys if not success or too slow latency.
+		if status != http.StatusOK {
+			logger = logger.With("status", status)
+		}
+		if latency > time.Second*3 {
+			logger = logger.With("latency", latencyValue)
+		}
+		logger.Infof("[ARTICLE_API] %v | %3d | %s | %13v | %15s | %-7s %#v",
+			timestamp.Format("2006/01/02 - 15:04:05"),
+			status,
+			latency,
+			latencyValue,
+			clientIP,
+			method,
+			path,
+		)
 	}
 }

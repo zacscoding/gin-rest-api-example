@@ -44,6 +44,7 @@ type JWTConfig struct {
 
 type DBConfig struct {
 	DataSourceName string `json:"dataSourceName"`
+	LogLevel       int    `json:"logLevel"`
 	Migrate        struct {
 		Enable bool   `json:"enable"`
 		Dir    string `json:"dir"`

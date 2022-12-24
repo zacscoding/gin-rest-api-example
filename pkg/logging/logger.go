@@ -87,7 +87,7 @@ func FromContext(ctx context.Context) *zap.SugaredLogger {
 	if ctx == nil {
 		return DefaultLogger()
 	}
-	if gCtx, ok := ctx.(*gin.Context); ok {
+	if gCtx, ok := ctx.(*gin.Context); ok && gCtx != nil {
 		ctx = gCtx.Request.Context()
 	}
 	if logger, ok := ctx.Value(loggerKey).(*zap.SugaredLogger); ok {
