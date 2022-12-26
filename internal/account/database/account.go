@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"gin-rest-api-example/internal/account/model"
+	"gin-rest-api-example/internal/cache"
 	"gin-rest-api-example/internal/database"
 	"gin-rest-api-example/pkg/logging"
 
@@ -22,7 +23,8 @@ type AccountDB interface {
 }
 
 // NewAccountDB creates a new account db with given db
-func NewAccountDB(db *gorm.DB) AccountDB {
+func NewAccountDB(db *gorm.DB, cacher cache.Cacher) AccountDB {
+	logging.DefaultLogger().Infof("cacher: %v", cacher)
 	return &accountDB{
 		db: db,
 	}

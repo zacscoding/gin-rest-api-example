@@ -1,5 +1,9 @@
 package config
 
+import (
+	"time"
+)
+
 var defaultConfig = map[string]interface{}{
 	"server.port":             8080,
 	"server.readTimeout":      "5s",
@@ -20,6 +24,20 @@ var defaultConfig = map[string]interface{}{
 	"db.pool.maxOpen":     10,
 	"db.pool.maxIdle":     5,
 	"db.pool.maxLifetime": "5m",
+
+	"cache.enabled":            false,
+	"cache.prefix":             "article-",
+	"cache.type":               "redis",
+	"cache.ttl":                60 * time.Second,
+	"cache.redis.cluster":      false,
+	"cache.redis.endpoints":    []string{"localhost:6379"},
+	"cache.redis.readTimeout":  "3s",
+	"cache.redis.writeTimeout": "3s",
+	"cache.redis.dialTimeout":  "5s",
+	"cache.redis.poolSize":     10,
+	"cache.redis.poolTimeout":  "1m",
+	"cache.redis.maxConnAge":   "0",
+	"cache.redis.idleTimeout":  "5m",
 
 	"metrics.namespace": "article_server",
 	"metrics.subsystem": "",

@@ -4,11 +4,12 @@ import (
 	"gin-rest-api-example/internal/account/model"
 	"gin-rest-api-example/internal/database"
 	"gin-rest-api-example/pkg/logging"
+	"testing"
+	"time"
+
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/zap/zapcore"
 	"gorm.io/gorm"
-	"testing"
-	"time"
 )
 
 type DBSuite struct {

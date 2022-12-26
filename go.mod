@@ -3,10 +3,13 @@ module gin-rest-api-example
 go 1.14
 
 require (
+	github.com/alicebob/miniredis/v2 v2.23.1
 	github.com/appleboy/gin-jwt/v2 v2.6.4
 	github.com/containerd/containerd v1.6.6 // indirect
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-playground/validator/v10 v10.2.0
+	github.com/go-redis/cache/v8 v8.4.4
+	github.com/go-redis/redis/v8 v8.11.3
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/google/uuid v1.2.0
