@@ -3,7 +3,9 @@ package database
 import (
 	"context"
 	"gin-rest-api-example/internal/account/model"
+	"gin-rest-api-example/internal/cache"
 	"gin-rest-api-example/internal/database"
+	"gin-rest-api-example/internal/metric"
 	"gin-rest-api-example/pkg/logging"
 
 	"gorm.io/gorm"
@@ -22,10 +24,11 @@ type AccountDB interface {
 }
 
 // NewAccountDB creates a new account db with given db
-func NewAccountDB(db *gorm.DB) AccountDB {
-	return &accountDB{
-		db: db,
+func NewAccountDB(db *gorm.DB, cacher cache.Cacher, mp *metric.MetricsProvider) AccountDB {
+	if cacher == nil {
+		return &accountDB{db: db}
 	}
+	return newAccountCacheDB(cacher, mp, &accountDB{db: db})
 }
 
 type accountDB struct {

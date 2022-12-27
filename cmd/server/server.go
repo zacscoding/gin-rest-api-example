@@ -8,6 +8,7 @@ import (
 	accountDB "gin-rest-api-example/internal/account/database"
 	"gin-rest-api-example/internal/article"
 	articleDB "gin-rest-api-example/internal/article/database"
+	"gin-rest-api-example/internal/cache"
 	"gin-rest-api-example/internal/config"
 	"gin-rest-api-example/internal/database"
 	"gin-rest-api-example/internal/metric"
@@ -39,9 +40,9 @@ func runApplication() {
 		log.Fatal(err)
 	}
 	logging.SetConfig(&logging.Config{
-		Encoding:    conf.Logging.Encoding,
-		Level:       zapcore.Level(conf.Logging.Level),
-		Development: conf.Logging.Development,
+		Encoding:    conf.LoggingConfig.Encoding,
+		Level:       zapcore.Level(conf.LoggingConfig.Level),
+		Development: conf.LoggingConfig.Development,
 	})
 	defer logging.DefaultLogger().Sync()
 
@@ -60,6 +61,8 @@ func runApplication() {
 			metric.NewMetricsProvider,
 			// setup database
 			database.NewDatabase,
+			// setup cache
+			cache.NewCacher,
 			// setup account packages
 			accountDB.NewAccountDB,
 			account.NewAuthMiddleware,

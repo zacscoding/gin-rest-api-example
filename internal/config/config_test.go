@@ -22,9 +22,9 @@ func TestLoad(t *testing.T) {
 	equalDuration(t, 10*time.Second, defaultConfig["server.writeTimeout"], cfg.ServerConfig.WriteTimeout)
 	equalDuration(t, 30*time.Second, defaultConfig["server.gracefulShutdown"], cfg.ServerConfig.GracefulShutdown)
 	// logging configs
-	equal(t, -1, defaultConfig["logging.level"], cfg.Logging.Level)
-	equal(t, "console", defaultConfig["logging.encoding"], cfg.Logging.Encoding)
-	equal(t, true, defaultConfig["logging.development"], cfg.Logging.Development)
+	equal(t, -1, defaultConfig["logging.level"], cfg.LoggingConfig.Level)
+	equal(t, "console", defaultConfig["logging.encoding"], cfg.LoggingConfig.Encoding)
+	equal(t, true, defaultConfig["logging.development"], cfg.LoggingConfig.Development)
 	// jwt configs
 	equal(t, "secret-key", defaultConfig["jwt.secret"], cfg.JwtConfig.Secret)
 	equalDuration(t, 864000*time.Second, defaultConfig["jwt.sessionTime"], cfg.JwtConfig.SessionTime)
@@ -36,7 +36,21 @@ func TestLoad(t *testing.T) {
 	equal(t, 10, defaultConfig["db.pool.maxOpen"], cfg.DBConfig.Pool.MaxOpen)
 	equal(t, 5, defaultConfig["db.pool.maxIdle"], cfg.DBConfig.Pool.MaxIdle)
 	equalDuration(t, 5*time.Minute, defaultConfig["db.pool.maxLifetime"], cfg.DBConfig.Pool.MaxLifetime)
-	//// metrics configs
+	// cache configs
+	equal(t, false, defaultConfig["cache.enabled"].(bool), cfg.CacheConfig.Enabled)
+	equal(t, "article-", defaultConfig["cache.prefix"].(string), cfg.CacheConfig.Prefix)
+	equal(t, "redis", defaultConfig["cache.type"].(string), cfg.CacheConfig.Type)
+	equalDuration(t, 60*time.Second, defaultConfig["cache.ttl"], cfg.CacheConfig.TTL)
+	equal(t, false, defaultConfig["cache.redis.cluster"].(bool), cfg.CacheConfig.RedisConfig.Cluster)
+	equal(t, []string{"localhost:6379"}, defaultConfig["cache.redis.endpoints"].([]string), cfg.CacheConfig.RedisConfig.Endpoints)
+	equalDuration(t, 3*time.Second, defaultConfig["cache.redis.readTimeout"], cfg.CacheConfig.RedisConfig.ReadTimeout)
+	equalDuration(t, 3*time.Second, defaultConfig["cache.redis.writeTimeout"], cfg.CacheConfig.RedisConfig.WriteTimeout)
+	equalDuration(t, 5*time.Second, defaultConfig["cache.redis.dialTimeout"], cfg.CacheConfig.RedisConfig.DialTimeout)
+	equal(t, 10, defaultConfig["cache.redis.poolSize"].(int), cfg.CacheConfig.RedisConfig.PoolSize)
+	equalDuration(t, 1*time.Minute, defaultConfig["cache.redis.poolTimeout"], cfg.CacheConfig.RedisConfig.PoolTimeout)
+	equalDuration(t, 0, defaultConfig["cache.redis.maxConnAge"], cfg.CacheConfig.RedisConfig.MaxConnAge)
+	equalDuration(t, 5*time.Minute, defaultConfig["cache.redis.idleTimeout"], cfg.CacheConfig.RedisConfig.IdleTimeout)
+	// metrics configs
 	equal(t, "article_server", defaultConfig["metrics.namespace"], cfg.MetricsConfig.Namespace)
 	equal(t, "", defaultConfig["metrics.subsystem"], cfg.MetricsConfig.Subsystem)
 }

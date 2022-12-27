@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 	"gin-rest-api-example/internal/article/model"
+	"gin-rest-api-example/internal/cache"
 	"gin-rest-api-example/internal/database"
+	"gin-rest-api-example/internal/metric"
 	"gin-rest-api-example/pkg/logging"
+	"time"
+
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
-	"time"
 )
 
 type IterateArticleCriteria struct {
@@ -50,6 +53,14 @@ type ArticleDB interface {
 	// DeleteComments deletes all comment with given author id and slug
 	// and returns deleted records count
 	DeleteComments(ctx context.Context, authorId uint, slug string) (int64, error)
+}
+
+// NewArticleDB creates a new article db with given db
+func NewArticleDB(db *gorm.DB, cacher cache.Cacher, mp *metric.MetricsProvider) ArticleDB {
+	if cacher == nil {
+		return &articleDB{db: db}
+	}
+	return newarticleCacheDB(cacher, mp, &articleDB{db: db})
 }
 
 type articleDB struct {
@@ -250,11 +261,4 @@ func (a *articleDB) DeleteArticleBySlug(ctx context.Context, authorId uint, slug
 		return err
 	}
 	return nil
-}
-
-// NewArticleDB creates a new article db with given db
-func NewArticleDB(db *gorm.DB) ArticleDB {
-	return &articleDB{
-		db: db,
-	}
 }

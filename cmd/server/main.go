@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
 	"log"
 	"os"
+
+	"github.com/spf13/cobra"
 )
 
 var configFile string

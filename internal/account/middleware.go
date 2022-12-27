@@ -3,6 +3,7 @@ package account
 import (
 	accountDB "gin-rest-api-example/internal/account/database"
 	"gin-rest-api-example/internal/account/model"
+	"gin-rest-api-example/internal/cache"
 	"gin-rest-api-example/internal/config"
 	"gin-rest-api-example/pkg/logging"
 	"net/http"
@@ -56,9 +57,14 @@ func NewAuthMiddleware(cfg *config.Config, accountDB accountDB.AccountDB) (*jwt.
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
-			email := claims[identityKey].(string)
-			logging.FromContext(c).Info("middleware.jwt.IdentityHandler", "email", email)
-			acc, _ := accountDB.FindByEmail(c.Request.Context(), email)
+			email, ok := claims[identityKey].(string)
+			if !ok {
+				return nil
+			}
+			acc, err := accountDB.FindByEmail(c.Request.Context(), email)
+			if err != nil {
+				return nil
+			}
 			return acc
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
@@ -66,9 +72,9 @@ func NewAuthMiddleware(cfg *config.Config, accountDB accountDB.AccountDB) (*jwt.
 			if err := c.ShouldBindJSON(&req); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
-			logging.FromContext(c).Info("middleware.jwt.Authenticator", "email", req.User.Email)
 
-			acc, err := accountDB.FindByEmail(c.Request.Context(), req.User.Email)
+			ctx := cache.WithCacheSkip(c.Request.Context(), true)
+			acc, err := accountDB.FindByEmail(ctx, req.User.Email)
 			if err != nil || acc.Disabled {
 				return nil, jwt.ErrFailedAuthentication
 			}
@@ -80,11 +86,15 @@ func NewAuthMiddleware(cfg *config.Config, accountDB accountDB.AccountDB) (*jwt.
 				return nil, jwt.ErrFailedAuthentication
 			}
 			return &model.Account{
-				ID:       acc.ID,
-				Username: acc.Username,
-				Email:    acc.Email,
-				Bio:      acc.Bio,
-				Image:    acc.Image,
+				ID:        acc.ID,
+				Username:  acc.Username,
+				Email:     acc.Email,
+				Password:  "",
+				Bio:       acc.Bio,
+				Image:     acc.Image,
+				CreatedAt: acc.CreatedAt,
+				UpdatedAt: acc.UpdatedAt,
+				Disabled:  acc.Disabled,
 			}, nil
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {

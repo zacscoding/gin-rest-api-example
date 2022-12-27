@@ -18,9 +18,10 @@ import (
 
 type Config struct {
 	ServerConfig  ServerConfig  `json:"server"`
-	Logging       LoggingConfig `json:"logging" yaml:"logging"`
+	LoggingConfig LoggingConfig `json:"logging" yaml:"logging"`
 	JwtConfig     JWTConfig     `json:"jwt"`
 	DBConfig      DBConfig      `json:"db"`
+	CacheConfig   CacheConfig   `json:"cache"`
 	MetricsConfig MetricsConfig `json:"metrics"`
 }
 
@@ -54,6 +55,26 @@ type DBConfig struct {
 		MaxIdle     int           `json:"maxIdle"`
 		MaxLifetime time.Duration `json:"maxLifetime"`
 	} `json:"pool"`
+}
+
+type CacheConfig struct {
+	Enabled     bool          `json:"enabled"`
+	Prefix      string        `json:"prefix"`
+	Type        string        `json:"type"`
+	TTL         time.Duration `json:"ttl"`
+	RedisConfig RedisConfig   `json:"redis"`
+}
+
+type RedisConfig struct {
+	Cluster      bool          `json:"cluster"`
+	Endpoints    []string      `json:"endpoints"`
+	ReadTimeout  time.Duration `json:"readTimeout"`
+	WriteTimeout time.Duration `json:"writeTimeout"`
+	DialTimeout  time.Duration `json:"dialTimeout"`
+	PoolSize     int           `json:"poolSize"`
+	PoolTimeout  time.Duration `json:"poolTimeout"`
+	MaxConnAge   time.Duration `json:"maxConnAge"`
+	IdleTimeout  time.Duration `json:"idleTimeout"`
 }
 
 type MetricsConfig struct {

@@ -21,6 +21,12 @@ import (
 	"github.com/pkg/errors"
 )
 
+func NewHandler(articleDB articleDB.ArticleDB) *Handler {
+	return &Handler{
+		articleDB: articleDB,
+	}
+}
+
 type Handler struct {
 	articleDB articleDB.ArticleDB
 }
@@ -209,11 +215,5 @@ func RouteV1(cfg *config.Config, h *Handler, r *gin.Engine, auth *jwt.GinJWTMidd
 		articleV1.DELETE(":slug", h.deleteArticle)
 		articleV1.POST(":slug/comments", h.saveComment)
 		articleV1.DELETE(":slug/comments/:id", h.deleteComment)
-	}
-}
-
-func NewHandler(articleDB articleDB.ArticleDB) *Handler {
-	return &Handler{
-		articleDB: articleDB,
 	}
 }
