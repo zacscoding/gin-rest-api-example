@@ -47,6 +47,15 @@ jobs:
         with:
           push: true
           tags: user/app:latest
+
+   # need checkout before using compose-action
+  Docker-compose:
+      runs-on: ubuntu-latest
+      steps: 
+      - uses: actions/checkout@v3
+      - uses: isbang/compose-action@v1.5.1
+        with:
+        compose-file: "./docker-compose.yml" 
   lint:
     name: lint
     runs-on: ubuntu-latest
