@@ -51,7 +51,7 @@ services:
     volumes:
       - ./config/local.yaml:/config/config.yaml
       - ./migrations:/config/migrations
-    command: article-server --conf /config/config.yaml
+    command: ./article-server --conf /config/config.yaml
     restart: always
     depends_on:
       - "db"

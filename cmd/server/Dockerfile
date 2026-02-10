@@ -1,11 +1,18 @@
-FROM golang:1.14-alpine AS build
-
-RUN mkdir -p /go/src/github.com/zacscoding/gin-rest-api-example ~/.ssh && \
-    apk add --no-cache git openssh-client make gcc libc-dev
-WORKDIR /go/src/github.com/zacscoding/gin-rest-api-example
+FROM golang:1.21-alpine AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
 COPY . .
-RUN make build
+RUN CGO_ENABLED=0 GOOS=linux go build -o article-server ./cmd/server
+FROM alpine:latest
 
-FROM alpine:3
-COPY --from=build /go/src/github.com/zacscoding/gin-rest-api-example/article-server /bin/article-server
-CMD /bin/article-server
+RUN apk --no-cache add ca-certificates tzdata
+
+WORKDIR /app
+COPY --from=builder /app/article-server .
+COPY --from=builder /app/config ./config
+COPY --from=builder /app/migrations ./migrations
+
+EXPOSE 8080
+
+CMD ["./article-server"]
